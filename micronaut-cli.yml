@@ -1,0 +1,5 @@
+profile: service
+defaultPackage: micronaut.bookman
+---
+testFramework: kotlintest
+sourceLanguage: kotlin
