@@ -16,6 +16,11 @@ spec:
           image: micronaut-bookman-example
           ports:
             - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: app-secret
 ---
 apiVersion: v1
 kind: Service

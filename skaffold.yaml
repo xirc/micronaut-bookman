@@ -4,3 +4,9 @@ build:
   artifacts:
     - image: micronaut-bookman-example
       jib: {}
+
+profiles:
+  - name: local
+    deploy:
+      kubectl:
+        manifests: ["k8s/*.yaml", "k8s/local/*.yaml"]
