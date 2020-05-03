@@ -1,3 +1,11 @@
 micronaut:
   application:
     name: micronaut-bookman
+
+datasources:
+  default:
+      url: jdbc:mysql://${rdb.host}:${rdb.port}/${rdb.database}
+      username: ${rdb.user}
+      password: ${rdb.password}
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      maximum-pool-size: 10

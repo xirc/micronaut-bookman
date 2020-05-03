@@ -15,6 +15,7 @@ group "micronaut.bookman"
 repositories {
     mavenCentral()
     maven { url "https://jcenter.bintray.com" }
+    jcenter()
 }
 
 configurations {
@@ -41,6 +42,11 @@ dependencies {
     testImplementation "io.micronaut.test:micronaut-test-kotlintest"
     testImplementation "io.mockk:mockk:1.9.3"
     testImplementation "io.kotlintest:kotlintest-runner-junit5:3.3.2"
+
+    // RDB
+    implementation "io.micronaut.configuration:micronaut-jdbc-hikari:2.1.0"
+    implementation 'mysql:mysql-connector-java:8.0.20'
+    testImplementation 'com.h2database:h2:1.4.200'
 }
 
 test.classpath += configurations.developmentOnly
