@@ -49,6 +49,9 @@ dependencies {
     testImplementation 'com.h2database:h2:1.4.197'
     // RDB Migration
     implementation "io.micronaut.configuration:micronaut-flyway:1.2.0"
+    // RDB DSL
+    implementation 'org.jetbrains.exposed:exposed-core:0.23.1'
+    implementation 'org.jetbrains.exposed:exposed-jdbc:0.23.1'
 }
 
 test.classpath += configurations.developmentOnly
