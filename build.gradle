@@ -46,7 +46,9 @@ dependencies {
     // RDB
     implementation "io.micronaut.configuration:micronaut-jdbc-hikari:2.1.0"
     implementation 'mysql:mysql-connector-java:8.0.20'
-    testImplementation 'com.h2database:h2:1.4.200'
+    testImplementation 'com.h2database:h2:1.4.197'
+    // RDB Migration
+    implementation "io.micronaut.configuration:micronaut-flyway:1.2.0"
 }
 
 test.classpath += configurations.developmentOnly

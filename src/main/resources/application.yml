@@ -9,3 +9,9 @@ datasources:
       password: ${rdb.password}
       driver-class-name: com.mysql.cj.jdbc.Driver
       maximum-pool-size: 10
+
+flyway:
+  datasources:
+    default:
+      locations: classpath:db/migrations
+      enabled: false

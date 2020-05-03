@@ -3,6 +3,7 @@ kind: ConfigMap
 metadata:
   name: app-config
 data:
+  MICRONAUT_ENVIRONMENTS: local
   RDB_HOST: mysql.default.svc.cluster.local
   RDB_PORT: "3306"
   RDB_DATABASE: bookman
