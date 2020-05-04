@@ -52,6 +52,7 @@ dependencies {
     // RDB DSL
     implementation 'org.jetbrains.exposed:exposed-core:0.23.1'
     implementation 'org.jetbrains.exposed:exposed-jdbc:0.23.1'
+    implementation 'org.jetbrains.exposed:exposed-jodatime:0.23.1'
 }
 
 test.classpath += configurations.developmentOnly
