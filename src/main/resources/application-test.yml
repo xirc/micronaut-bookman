@@ -5,3 +5,8 @@ datasources:
     password: ""
     driver-class-name: org.h2.Driver
     maximum-pool-size: 10
+
+flyway:
+  datasources:
+    default:
+      enabled: true
