@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bookman
+spec:
+  selector:
+    matchLabels:
+      app: bookman
+  template:
+    metadata:
+      labels:
+        app: bookman
+    spec:
+      containers:
+        - name: bookman
+          image: micronaut-bookman-example
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: app-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bookman
+spec:
+  ports:
+    - port: 8080
+      name: http
+  type: LoadBalancer
+  selector:
+    app: bookman

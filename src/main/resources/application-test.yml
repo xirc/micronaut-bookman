@@ -1,0 +1,12 @@
+datasources:
+  default:
+    url: jdbc:h2:mem:default;MODE=MySQL;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=true;
+    username: root
+    password: ""
+    driver-class-name: org.h2.Driver
+    maximum-pool-size: 10
+
+flyway:
+  datasources:
+    default:
+      enabled: true
