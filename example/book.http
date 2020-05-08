@@ -1,0 +1,25 @@
+@url = http://localhost:8080
+@type = application/json
+
+###
+# @name book1
+POST {{url}}/books
+Content-Type: {{type}}
+
+{
+    "title": "a book title"
+}
+
+###
+GET {{url}}/books/{{book1.response.body.$.value.id}}
+
+###
+DELETE {{url}}/books/{{book1.response.body.$.value.id}}
+
+###
+PATCH {{url}}/books/{{book1.response.body.$.value.id}}
+Content-Type: {{type}}
+
+{
+    "title": "a new book title"
+}
