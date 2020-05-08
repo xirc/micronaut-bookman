@@ -1,0 +1,7 @@
+CREATE TABLE person (
+    id VARCHAR(36) PRIMARY KEY,
+    first_name VARCHAR(128) NOT NULL DEFAULT '',
+    last_name VARCHAR(128) NOT NULL DEFAULT '',
+    created_date DATETIME NOT NULL DEFAULT NOW(),
+    updated_date DATETIME NOT NULL DEFAULT NOW()
+);
