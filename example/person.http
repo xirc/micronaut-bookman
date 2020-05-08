@@ -1,0 +1,28 @@
+@url = http://localhost:8080
+@type = application/json
+
+###
+
+# @name person1
+POST {{url}}/persons
+Content-Type: {{type}}
+
+{
+    "firstName": "Hermione",
+    "lastName": "Granger"
+}
+
+###
+GET {{url}}/persons/{{person1.response.body.$.value.id}}
+
+###
+DELETE {{url}}/persons/{{person1.response.body.$.value.id}}
+
+###
+PATCH {{url}}/persons/{{person1.response.body.$.value.id}}
+Content-Type: {{type}}
+
+{
+    "firstName": "Ronald",
+    "lastName": "Weasley"
+}
