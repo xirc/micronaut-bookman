@@ -2,6 +2,11 @@ micronaut:
   application:
     name: micronaut-bookman
 
+jackson:
+  # ISO 8601
+  date-format: "yyyy-MM-dd'T'HH:mm:ssXXX"
+  time-zone: "Asia/Tokyo"
+
 datasources:
   default:
       url: jdbc:mysql://${rdb.host}:${rdb.port}/${rdb.database}
