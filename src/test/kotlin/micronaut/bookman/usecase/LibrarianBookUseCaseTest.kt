@@ -94,4 +94,10 @@ class LibrarianBookUseCaseTest(
         newRes.book.author?.personId shouldBe person.id
     }
 
+    "Librarian can update nothing" {
+        val book = useCase.createBook("a book").book
+        val person = personUseCase.createPerson(FullName("abc", "def"))
+        useCase.patchBook(book.id, null, person.id)
+    }
+
 })
