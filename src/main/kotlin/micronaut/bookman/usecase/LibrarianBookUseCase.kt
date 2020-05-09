@@ -41,11 +41,11 @@ class LibrarianBookUseCase(
         if (title != null) {
             book.updateTitle(title)
         }
-        val author = authorId?.let {
+        authorId?.let {
             book.updateAuthor(BookAuthor(authorId))
-            personRepository.get(authorId)
         }
         val updatedBook = repository.update(book)
+        val author = book.author?.let { personRepository.get(it.personId) }
         return BookDTO(updatedBook, author)
     }
 }
