@@ -19,8 +19,6 @@ spec:
             - --character-set-server=utf8mb4
             - --collation-server=utf8mb4_unicode_ci
           env:
-            - name: TZ
-              value: UTC
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:

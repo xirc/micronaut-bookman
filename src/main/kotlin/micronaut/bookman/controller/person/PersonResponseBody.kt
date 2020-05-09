@@ -12,7 +12,7 @@ data class PersonResponseBody private constructor(
 ) {
     companion object {
         fun createFrom(person: Person) = PersonResponseBody(
-                person.id,
+                person.id.toString(),
                 person.name.firstName,
                 person.name.lastName,
                 person.createdDate,

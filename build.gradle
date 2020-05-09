@@ -47,15 +47,13 @@ dependencies {
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-joda:2.9.5"
 
     // RDB
+    compileOnly "io.micronaut.data:micronaut-data-processor:1.0.2"
+    compileOnly "jakarta.persistence:jakarta.persistence-api:2.2.2"
+    implementation "io.micronaut.data:micronaut-data-jdbc:1.0.2"
     implementation "io.micronaut.configuration:micronaut-jdbc-hikari:2.1.0"
     implementation 'mysql:mysql-connector-java:8.0.20'
     testImplementation 'com.h2database:h2:1.4.197'
-    // RDB Migration
     implementation "io.micronaut.configuration:micronaut-flyway:1.2.0"
-    // RDB DSL
-    implementation 'org.jetbrains.exposed:exposed-core:0.23.1'
-    implementation 'org.jetbrains.exposed:exposed-jdbc:0.23.1'
-    implementation 'org.jetbrains.exposed:exposed-jodatime:0.23.1'
 }
 
 test.classpath += configurations.developmentOnly

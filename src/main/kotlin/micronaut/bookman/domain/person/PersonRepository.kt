@@ -1,8 +1,10 @@
 package micronaut.bookman.domain.person
 
+import java.util.*
+
 interface PersonRepository {
-    fun get(id: String): Person
-    fun post(person: Person)
-    fun put(person: Person)
-    fun delete(id: String)
+    fun get(id: UUID): Person
+    fun save(person: Person): Person
+    fun update(person: Person): Person
+    fun delete(id: UUID)
 }

@@ -6,9 +6,12 @@
 * Micronaut <https://micronaut.io/>
 * Kotlin <https://kotlinlang.org/>
 * Flyway <https://flywaydb.org/>
-* Exposed <https://github.com/JetBrains/Exposed/>  
-  I may use `JOOQ` instead of this.
+* Micronaut Data <https://micronaut-projects.github.io/micronaut-data/>
 
 ## Development Environment
 * Kubernates
 * Skaffold
+
+## NOTE
+
+* MySQL の TimeZone は UTC にすること
