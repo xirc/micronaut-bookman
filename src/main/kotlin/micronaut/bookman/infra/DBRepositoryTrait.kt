@@ -11,12 +11,9 @@ interface DBRepositoryTrait {
     fun <T> catchingKnownException(statement: Unit.() -> T): T {
         return try {
             statement(Unit)
-        } catch (e: IllegalStateException) {
-            // Transaction が存在しない場合に SQL を実行しようとすると起きるため
-            throw InfraException(e)
         } catch (e: SQLException) {
             // データベースの制約を満たしていない場合などに起きるため
-            throw InfraException(e)
+            throw e;//InfraException(e)
         } catch (e: ExposedSQLException) {
             // データベースの制約を満たしていない場合などに起きるため
             throw InfraException(e)

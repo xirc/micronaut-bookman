@@ -7,9 +7,11 @@ import io.micronaut.test.annotation.MicronautTest
 import micronaut.bookman.SpecWithDataSource
 import micronaut.bookman.domain.book.Book
 import micronaut.bookman.domain.book.BookAuthor
+import micronaut.bookman.domain.book.error.DuplicateBookException
 import micronaut.bookman.domain.book.error.NoBookException
 import micronaut.bookman.domain.person.FullName
 import micronaut.bookman.domain.person.Person
+import micronaut.bookman.domain.person.error.NoPersonException
 import micronaut.bookman.domain.time.ServerDateTimeFactory
 import micronaut.bookman.infra.book.DBBookRepository
 import micronaut.bookman.infra.error.InfraException
@@ -40,7 +42,7 @@ class DBBookRepositoryTest(private val source: DataSource) : SpecWithDataSource(
         shouldNotThrowAny {
             repository.save(book)
         }
-        shouldThrow<InfraException> {
+        shouldThrow<DuplicateBookException> {
             repository.save(book)
         }
     }
@@ -99,14 +101,13 @@ class DBBookRepositoryTest(private val source: DataSource) : SpecWithDataSource(
 
     "DBBookRepository cannot update a book with invalid ID" {
         val book = factory.create()
-        book.updateAuthor(BookAuthor(UUID.randomUUID().toString()))
         shouldThrow<NoBookException> {
             repository.update(book)
         }
 
         repository.save(book)
 
-        shouldThrow<InfraException> {
+        shouldThrow<NoPersonException> {
             val personId = UUID.randomUUID().toString()
             book.updateAuthor(BookAuthor(personId))
             repository.update(book)

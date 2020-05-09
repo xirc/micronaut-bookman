@@ -3,12 +3,17 @@ package micronaut.bookman.infra.book
 import micronaut.bookman.domain.book.Book
 import micronaut.bookman.domain.book.BookAuthor
 import micronaut.bookman.domain.book.BookRepository
+import micronaut.bookman.domain.book.error.DuplicateBookException
 import micronaut.bookman.domain.book.error.NoBookException
+import micronaut.bookman.domain.person.error.NoPersonException
 import micronaut.bookman.infra.DBRepositoryTrait
 import micronaut.bookman.infra.error.IllegalDatabaseSchema
+import micronaut.bookman.infra.error.InfraException
 import micronaut.bookman.infra.extension.insertOrUpdate
+import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.sql.SQLIntegrityConstraintViolationException
 import javax.sql.DataSource
 
 class DBBookRepository(
@@ -30,78 +35,94 @@ class DBBookRepository(
 
     override fun get(id: String): Book {
         return transaction (Database.connect(source)) {
-            catchingKnownException {
-                withUtcZone {
-                    val bookAuthor = BookAuthorTable.select { BookAuthorTable.book_id eq id }.singleOrNull()?.let {
-                        createBookAuthor(it)
-                    }
-                    val book = BookTable.select { BookTable.id eq id }.singleOrNull()?.let {
-                        createBook(it, bookAuthor)
-                    }
-                    book?.apply {  } ?: throw NoBookException(id)
+            withUtcZone {
+                val bookAuthor = BookAuthorTable.select { BookAuthorTable.book_id eq id }.singleOrNull()?.let {
+                    createBookAuthor(it)
                 }
+                val book = BookTable.select { BookTable.id eq id }.singleOrNull()?.let {
+                    createBook(it, bookAuthor)
+                }
+                book ?: throw NoBookException(id)
             }
         }
     }
 
     override fun save(book: Book): Book {
         return transaction (Database.connect(source)) {
-            catchingKnownException {
-                withUtcZone {
+            withUtcZone {
+                try {
                     BookTable.insert {
                         it[id] = book.id
                         it[title] = book.title
                         it[createdDate] = book.createdDate
                         it[updatedDate] = book.updatedDate
                     }
-                    book.author?.also { author: BookAuthor ->
+                } catch (e: ExposedSQLException) {
+                    if (e.cause is SQLIntegrityConstraintViolationException) {
+                        throw DuplicateBookException(book.id)
+                    } else {
+                        throw InfraException(e)
+                    }
+                }
+                book.author?.also { author: BookAuthor ->
+                    try {
                         BookAuthorTable.insert {
                             it[book_id] = book.id
                             it[person_id] = author.personId
                         }
+                    } catch (e: ExposedSQLException) {
+                        if (e.cause is SQLIntegrityConstraintViolationException) {
+                            throw NoPersonException(author.personId)
+                        } else {
+                            throw InfraException(e)
+                        }
                     }
-                    book
                 }
+                book
             }
         }
     }
 
     override fun update(book: Book): Book {
         return transaction (Database.connect(source)) {
-            catchingKnownException {
-                withUtcZone {
-                    val count = BookTable.update({ BookTable.id eq book.id }) {
-                        it[title] = book.title
-                        it[createdDate] = book.createdDate
-                        it[updatedDate] = book.updatedDate
-                    }
-                    when (count) {
-                        0 -> throw NoBookException(book.id)
-                        1 -> Unit
-                        else -> throw IllegalDatabaseSchema("Table ${BookTable.tableName} has illegal schema.")
-                    }
-                    book.author?.let { author: BookAuthor ->
-                        BookAuthorTable.insertOrUpdate(BookAuthorTable.book_id){
+            withUtcZone {
+                val count = BookTable.update({ BookTable.id eq book.id }) {
+                    it[title] = book.title
+                    it[createdDate] = book.createdDate
+                    it[updatedDate] = book.updatedDate
+                }
+                when (count) {
+                    0 -> throw NoBookException(book.id)
+                    1 -> Unit
+                    else -> throw IllegalDatabaseSchema("Table ${BookTable.tableName} has illegal schema.")
+                }
+                book.author?.let { author: BookAuthor ->
+                    try {
+                        BookAuthorTable.insertOrUpdate(BookAuthorTable.book_id) {
                             it[book_id] = book.id
                             it[person_id] = author.personId
                         }
+                    } catch (e: ExposedSQLException) {
+                        if (e.cause is SQLIntegrityConstraintViolationException) {
+                            throw NoPersonException(author.personId)
+                        } else {
+                            throw InfraException(e)
+                        }
                     }
-                    book
                 }
+                book
             }
         }
     }
 
     override fun delete(id: String): Unit {
         return transaction (Database.connect(source)) {
-            catchingKnownException {
-                BookAuthorTable.deleteWhere { BookAuthorTable.book_id eq id }
-                val count = BookTable.deleteWhere { BookTable.id eq id }
-                when (count) {
-                    0 -> throw NoBookException(id)
-                    1 -> Unit
-                    else -> throw IllegalDatabaseSchema("Table ${BookTable.tableName} has illegal schema.")
-                }
+            BookAuthorTable.deleteWhere { BookAuthorTable.book_id eq id }
+            val count = BookTable.deleteWhere { BookTable.id eq id }
+            when (count) {
+                0 -> throw NoBookException(id)
+                1 -> Unit
+                else -> throw IllegalDatabaseSchema("Table ${BookTable.tableName} has illegal schema.")
             }
         }
     }
