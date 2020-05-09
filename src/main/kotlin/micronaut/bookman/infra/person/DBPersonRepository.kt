@@ -3,11 +3,15 @@ package micronaut.bookman.infra.person
 import micronaut.bookman.domain.person.FullName
 import micronaut.bookman.domain.person.Person
 import micronaut.bookman.domain.person.PersonRepository
+import micronaut.bookman.domain.person.error.DuplicatePersonException
 import micronaut.bookman.domain.person.error.NoPersonException
 import micronaut.bookman.infra.DBRepositoryTrait
 import micronaut.bookman.infra.error.IllegalDatabaseSchema
+import micronaut.bookman.infra.error.InfraException
+import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.sql.SQLIntegrityConstraintViolationException
 import javax.sql.DataSource
 
 
@@ -29,27 +33,31 @@ class DBPersonRepository(
 
     override fun get(id: String): Person {
         return transaction(Database.connect(source)) {
-            catchingKnownException {
-                withUtcZone {
-                    val person = PersonTable.select { PersonTable.id eq id }.singleOrNull()?.let {
-                        createPerson(it)
-                    }
-                    person ?: throw NoPersonException(id)
+            withUtcZone {
+                val person = PersonTable.select { PersonTable.id eq id }.singleOrNull()?.let {
+                    createPerson(it)
                 }
+                person ?: throw NoPersonException(id)
             }
         }
     }
 
     override fun post(person: Person) {
         return transaction (Database.connect(source)) {
-            catchingKnownException {
-                withUtcZone {
+            withUtcZone {
+                try {
                     PersonTable.insert {
                         it[id] = person.id
                         it[firstName] = person.name.firstName
                         it[lastName] = person.name.lastName
                         it[createdDate] = person.createdDate
                         it[updatedDate] = person.updatedDate
+                    }
+                } catch (e: ExposedSQLException) {
+                    if (e.cause is SQLIntegrityConstraintViolationException) {
+                        throw DuplicatePersonException(person.id)
+                    } else {
+                        throw InfraException(e)
                     }
                 }
             }
@@ -58,19 +66,17 @@ class DBPersonRepository(
 
     override fun put(person: Person) {
         return transaction (Database.connect(source)) {
-            catchingKnownException {
-                withUtcZone {
-                    val count = PersonTable.update({ PersonTable.id eq person.id }) {
-                        it[firstName] = person.name.firstName
-                        it[lastName] = person.name.lastName
-                        it[createdDate] = person.createdDate
-                        it[updatedDate] = person.updatedDate
-                    }
-                    when (count) {
-                        0 -> throw NoPersonException(person.id)
-                        1 -> Unit
-                        else -> throw IllegalDatabaseSchema("Table ${PersonTable.tableName} has illegal schema.")
-                    }
+            withUtcZone {
+                val count = PersonTable.update({ PersonTable.id eq person.id }) {
+                    it[firstName] = person.name.firstName
+                    it[lastName] = person.name.lastName
+                    it[createdDate] = person.createdDate
+                    it[updatedDate] = person.updatedDate
+                }
+                when (count) {
+                    0 -> throw NoPersonException(person.id)
+                    1 -> Unit
+                    else -> throw IllegalDatabaseSchema("Table ${PersonTable.tableName} has illegal schema.")
                 }
             }
         }
@@ -78,13 +84,11 @@ class DBPersonRepository(
 
     override fun delete(id: String) {
         return transaction (Database.connect(source)) {
-            catchingKnownException {
-                val count = PersonTable.deleteWhere { PersonTable.id eq id }
-                when (count) {
-                    0 -> throw NoPersonException(id)
-                    1 -> Unit
-                    else -> throw IllegalDatabaseSchema("Table ${PersonTable.tableName} has illegal schema.")
-                }
+            val count = PersonTable.deleteWhere { PersonTable.id eq id }
+            when (count) {
+                0 -> throw NoPersonException(id)
+                1 -> Unit
+                else -> throw IllegalDatabaseSchema("Table ${PersonTable.tableName} has illegal schema.")
             }
         }
     }

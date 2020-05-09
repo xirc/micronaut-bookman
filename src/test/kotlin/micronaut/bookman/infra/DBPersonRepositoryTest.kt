@@ -7,6 +7,7 @@ import io.micronaut.test.annotation.MicronautTest
 import micronaut.bookman.SpecWithDataSource
 import micronaut.bookman.domain.person.FullName
 import micronaut.bookman.domain.person.Person
+import micronaut.bookman.domain.person.error.DuplicatePersonException
 import micronaut.bookman.domain.person.error.NoPersonException
 import micronaut.bookman.domain.time.ServerDateTimeFactory
 import micronaut.bookman.infra.error.InfraException
@@ -35,7 +36,7 @@ class DBPersonRepositoryTest(private val source: DataSource) : SpecWithDataSourc
         shouldNotThrowAny {
             repository.post(person)
         }
-        shouldThrow<InfraException> {
+        shouldThrow<DuplicatePersonException> {
             repository.post(person)
         }
     }
