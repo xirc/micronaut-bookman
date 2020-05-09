@@ -6,6 +6,7 @@ import micronaut.bookman.domain.person.PersonRepository
 import micronaut.bookman.domain.person.error.DuplicatePersonException
 import micronaut.bookman.domain.person.error.NoPersonException
 import micronaut.bookman.infra.DBRepositoryTrait
+import micronaut.bookman.infra.schema.PersonTable
 import micronaut.bookman.infra.error.IllegalDatabaseSchema
 import micronaut.bookman.infra.error.InfraException
 import org.jetbrains.exposed.exceptions.ExposedSQLException
