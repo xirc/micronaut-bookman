@@ -6,7 +6,8 @@
 * Micronaut <https://micronaut.io/>
 * Kotlin <https://kotlinlang.org/>
 * Flyway <https://flywaydb.org/>
-* Micronaut Data <https://micronaut-projects.github.io/micronaut-data/>
+* Exposed <https://github.com/JetBrains/Exposed/>  
+  I may use `JOOQ` instead of this.
 
 ## Development Environment
 * Kubernates

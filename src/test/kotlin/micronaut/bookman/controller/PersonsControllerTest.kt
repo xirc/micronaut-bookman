@@ -2,12 +2,11 @@ package micronaut.bookman.controller
 
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldNotBe
+import io.kotlintest.specs.StringSpec
 import io.micronaut.context.ApplicationContext
 import io.micronaut.http.HttpStatus
 import io.micronaut.runtime.server.EmbeddedServer
 import io.micronaut.test.annotation.MicronautTest
-import micronaut.bookman.RepositoryCollection
-import micronaut.bookman.SpecWithDataSource
 import micronaut.bookman.controller.person.CreatePersonRequest
 import micronaut.bookman.controller.person.PatchPersonRequest
 import micronaut.bookman.controller.person.PersonResponseBody
@@ -15,10 +14,7 @@ import micronaut.bookman.controller.person.PersonsClient
 import java.util.*
 
 @MicronautTest
-class PersonsControllerTest(
-        ctx: ApplicationContext,
-        repositoryCollection: RepositoryCollection
-): SpecWithDataSource(repositoryCollection, {
+class PersonsControllerTest(ctx: ApplicationContext): StringSpec({
     val embeddedServer: EmbeddedServer = ctx.getBean(EmbeddedServer::class.java)
     val client = embeddedServer.applicationContext.getBean(PersonsClient::class.java)
 

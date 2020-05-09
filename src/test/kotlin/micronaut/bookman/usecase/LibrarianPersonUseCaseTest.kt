@@ -4,19 +4,22 @@ import io.kotlintest.shouldBe
 import io.kotlintest.shouldNotBe
 import io.kotlintest.shouldThrow
 import io.micronaut.test.annotation.MicronautTest
-import micronaut.bookman.RepositoryCollection
 import micronaut.bookman.SpecWithDataSource
 import micronaut.bookman.domain.person.FullName
-import micronaut.bookman.domain.person.PersonRepository
+import micronaut.bookman.domain.person.Person
 import micronaut.bookman.domain.person.error.NoPersonException
+import micronaut.bookman.domain.time.ServerDateTimeFactory
+import micronaut.bookman.infra.person.DBPersonRepository
 import java.util.*
+import javax.sql.DataSource
 
 @MicronautTest
-class LibrarianPersonUseCaseTest(
-        private val repositoryCollection: RepositoryCollection,
-        private val repository: PersonRepository
-): SpecWithDataSource(repositoryCollection, {
-    val useCase = LibrarianPersonUseCase(repository)
+class LibrarianPersonUseCaseTest(private val source: DataSource): SpecWithDataSource(source, {
+    val factory = Person.Factory(ServerDateTimeFactory())
+    val useCase = LibrarianPersonUseCase(
+            factory,
+            DBPersonRepository(source, factory)
+    )
 
     "Librarian can create a person" {
         val name = FullName("Harry", "Potter")
@@ -38,7 +41,7 @@ class LibrarianPersonUseCaseTest(
     }
 
     "Librarian cannot get a person with invalid ID" {
-        val id = UUID.randomUUID()
+        val id = UUID.randomUUID().toString()
         shouldThrow<NoPersonException> {
             useCase.getPerson(id)
         }
@@ -50,7 +53,7 @@ class LibrarianPersonUseCaseTest(
     }
 
     "Librarian cannot delete a person with invalid ID" {
-        val id = UUID.randomUUID()
+        val id = UUID.randomUUID().toString()
         shouldThrow<NoPersonException> {
             useCase.deletePerson(id)
         }
@@ -77,7 +80,7 @@ class LibrarianPersonUseCaseTest(
     }
 
     "Librarian cannot update name of a person with invalid ID" {
-        val id = UUID.randomUUID()
+        val id = UUID.randomUUID().toString()
         shouldThrow<NoPersonException> {
             useCase.patchPerson(id, "first", "last")
         }
