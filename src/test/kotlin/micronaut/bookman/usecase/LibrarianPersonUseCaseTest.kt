@@ -7,18 +7,20 @@ import io.micronaut.test.annotation.MicronautTest
 import micronaut.bookman.SpecWithDataSource
 import micronaut.bookman.domain.person.FullName
 import micronaut.bookman.domain.person.Person
+import micronaut.bookman.domain.person.PersonRepository
 import micronaut.bookman.domain.person.error.NoPersonException
-import micronaut.bookman.domain.time.ServerDateTimeFactory
-import micronaut.bookman.infra.person.DBPersonRepository
 import java.util.*
 import javax.sql.DataSource
 
 @MicronautTest
-class LibrarianPersonUseCaseTest(private val source: DataSource): SpecWithDataSource(source, {
-    val factory = Person.Factory(ServerDateTimeFactory())
+class LibrarianPersonUseCaseTest(
+        private val source: DataSource,
+        private val factory: Person.Factory,
+        private val repository: PersonRepository
+): SpecWithDataSource(source, {
     val useCase = LibrarianPersonUseCase(
             factory,
-            DBPersonRepository(source, factory)
+            repository
     )
 
     "Librarian can create a person" {

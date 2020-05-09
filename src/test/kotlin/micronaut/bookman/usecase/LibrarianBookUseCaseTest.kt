@@ -6,23 +6,26 @@ import io.kotlintest.shouldThrow
 import io.micronaut.test.annotation.MicronautTest
 import micronaut.bookman.SpecWithDataSource
 import micronaut.bookman.domain.book.Book
+import micronaut.bookman.domain.book.BookRepository
 import micronaut.bookman.domain.book.error.NoBookException
 import micronaut.bookman.domain.person.FullName
 import micronaut.bookman.domain.person.Person
+import micronaut.bookman.domain.person.PersonRepository
 import micronaut.bookman.domain.time.ServerDateTimeFactory
-import micronaut.bookman.infra.book.DBBookRepository
-import micronaut.bookman.infra.person.DBPersonRepository
 import java.util.*
 import javax.sql.DataSource
 
 @MicronautTest
-class LibrarianBookUseCaseTest(private val source: DataSource) : SpecWithDataSource(source, {
-    val factory = Book.Factory(ServerDateTimeFactory())
-    val personFactory = Person.Factory(ServerDateTimeFactory())
-    val personRepository = DBPersonRepository(source, personFactory)
+class LibrarianBookUseCaseTest(
+        private val source: DataSource,
+        private val factory: Book.Factory,
+        private val personFactory: Person.Factory,
+        private val repository: BookRepository,
+        private val personRepository: PersonRepository
+) : SpecWithDataSource(source, {
     val useCase = LibrarianBookUseCase(
             factory,
-            DBBookRepository(source, factory),
+            repository,
             personRepository
     )
     val personUseCase = LibrarianPersonUseCase(

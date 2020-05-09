@@ -5,25 +5,14 @@ import io.micronaut.http.annotation.*
 import micronaut.bookman.controller.BookErrorResponseSyntax.toResponseBody
 import micronaut.bookman.controller.PersonErrorResponseSyntax.toResponseBody
 import micronaut.bookman.controller.UnitResponse
-import micronaut.bookman.domain.book.Book
 import micronaut.bookman.domain.book.error.NoBookException
-import micronaut.bookman.domain.person.Person
 import micronaut.bookman.domain.person.error.NoPersonException
-import micronaut.bookman.domain.time.ServerDateTimeFactory
-import micronaut.bookman.infra.book.DBBookRepository
-import micronaut.bookman.infra.person.DBPersonRepository
 import micronaut.bookman.usecase.LibrarianBookUseCase
-import micronaut.bookman.usecase.LibrarianPersonUseCase
-import javax.sql.DataSource
 
 @Controller("/books")
-class BooksController(private val source: DataSource) : BooksApi {
-    private val factory = Book.Factory(ServerDateTimeFactory())
-    private val repository = DBBookRepository(source, factory)
-    private val personFactory = Person.Factory(ServerDateTimeFactory())
-    private val personRepository = DBPersonRepository(source, personFactory)
-    private val useCase = LibrarianBookUseCase(factory, repository, personRepository)
-    private val personUseCase = LibrarianPersonUseCase(personFactory, personRepository)
+class BooksController(
+        private val useCase: LibrarianBookUseCase
+) : BooksApi {
 
     override fun create(request: CreateBookRequest): HttpResponse<BookResponse> {
         val book = useCase.createBook(request.title)
@@ -66,4 +55,5 @@ class BooksController(private val source: DataSource) : BooksApi {
             HttpResponse.ok(body)
         }
     }
+
 }

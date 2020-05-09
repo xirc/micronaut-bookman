@@ -1,5 +1,6 @@
 package micronaut.bookman.infra.person
 
+import io.micronaut.context.annotation.Primary
 import micronaut.bookman.domain.person.FullName
 import micronaut.bookman.domain.person.Person
 import micronaut.bookman.domain.person.PersonRepository
@@ -13,9 +14,11 @@ import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.sql.SQLIntegrityConstraintViolationException
+import javax.inject.Singleton
 import javax.sql.DataSource
 
-
+@Primary
+@Singleton
 class DBPersonRepository(
         private val source: DataSource,
         private val factory: Person.Factory

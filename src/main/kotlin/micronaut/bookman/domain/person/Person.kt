@@ -4,6 +4,7 @@ import micronaut.bookman.domain.person.error.IllegalPersonStateException
 import micronaut.bookman.domain.time.DateTimeFactory
 import org.joda.time.DateTime
 import java.util.*
+import javax.inject.Singleton
 
 class Person private constructor(
         private val timeFactory: DateTimeFactory,
@@ -27,6 +28,7 @@ class Person private constructor(
         updatedDate = timeFactory.now()
     }
 
+    @Singleton
     class Factory(private val timeFactory: DateTimeFactory) {
         fun create(name: FullName): Person = Person(
                 timeFactory,

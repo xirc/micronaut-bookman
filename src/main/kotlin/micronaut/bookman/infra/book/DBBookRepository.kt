@@ -1,5 +1,6 @@
 package micronaut.bookman.infra.book
 
+import io.micronaut.context.annotation.Primary
 import micronaut.bookman.domain.book.Book
 import micronaut.bookman.domain.book.BookAuthor
 import micronaut.bookman.domain.book.BookRepository
@@ -16,8 +17,11 @@ import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.sql.SQLIntegrityConstraintViolationException
+import javax.inject.Singleton
 import javax.sql.DataSource
 
+@Primary
+@Singleton
 class DBBookRepository(
         private val source: DataSource,
         private val factory: Book.Factory

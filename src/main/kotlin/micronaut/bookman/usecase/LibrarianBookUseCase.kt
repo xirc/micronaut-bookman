@@ -5,7 +5,9 @@ import micronaut.bookman.domain.book.BookAuthor
 import micronaut.bookman.domain.book.BookRepository
 import micronaut.bookman.domain.person.Person
 import micronaut.bookman.domain.person.PersonRepository
+import javax.inject.Singleton
 
+@Singleton
 class LibrarianBookUseCase(
         private val factory: Book.Factory,
         private val repository: BookRepository,
