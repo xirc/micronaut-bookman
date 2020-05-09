@@ -11,7 +11,7 @@ data class BookResponseBody private constructor(
 ) {
     companion object {
         fun createFrom(book: Book) = BookResponseBody(
-                book.id.toString(),
+                book.id,
                 book.title,
                 book.createdDate,
                 book.updatedDate

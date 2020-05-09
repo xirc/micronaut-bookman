@@ -2,30 +2,32 @@ package micronaut.bookman.usecase
 
 import micronaut.bookman.domain.book.Book
 import micronaut.bookman.domain.book.BookRepository
-import java.util.*
 
 class LibrarianBookUseCase(
+        private val factory: Book.Factory,
         private val repository: BookRepository
 ) {
-    fun getBook(id: UUID): Book {
+    fun getBook(id: String): Book {
         return repository.get(id)
     }
 
     fun createBook(title: String): Book {
-        val book = Book.create()
+        val book = factory.create()
         book.updateTitle(title)
-        return repository.save(book)
+        repository.post(book)
+        return book
     }
 
-    fun deleteBook(id: UUID) {
+    fun deleteBook(id: String) {
         repository.delete(id)
     }
 
-    fun patchBook(id: UUID, title: String?): Book {
+    fun patchBook(id: String, title: String?): Book {
         val book = repository.get(id)
         if (title != null) {
             book.updateTitle(title)
         }
-        return repository.update(book)
+        repository.put(book)
+        return book
     }
 }

@@ -1,13 +1,13 @@
 package micronaut.bookman.controller
 
 import io.kotlintest.shouldBe
+import io.kotlintest.shouldNot
 import io.kotlintest.shouldNotBe
 import io.micronaut.http.HttpStatus
+import io.kotlintest.specs.StringSpec
 import io.micronaut.context.ApplicationContext
 import io.micronaut.runtime.server.EmbeddedServer
 import io.micronaut.test.annotation.MicronautTest
-import micronaut.bookman.RepositoryCollection
-import micronaut.bookman.SpecWithDataSource
 import micronaut.bookman.controller.book.BookResponseBody
 import micronaut.bookman.controller.book.BooksClient
 import micronaut.bookman.controller.book.CreateBookRequest
@@ -15,10 +15,7 @@ import micronaut.bookman.controller.book.PatchBookRequest
 import java.util.*
 
 @MicronautTest
-class BooksControllerTest(
-        ctx: ApplicationContext,
-        repositoryCollection: RepositoryCollection
-): SpecWithDataSource(repositoryCollection, {
+class BooksControllerTest(ctx: ApplicationContext): StringSpec({
     val embeddedServer: EmbeddedServer = ctx.getBean(EmbeddedServer::class.java)
     val client = embeddedServer.applicationContext.getBean(BooksClient::class.java)
 

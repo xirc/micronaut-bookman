@@ -4,18 +4,21 @@ import io.kotlintest.shouldBe
 import io.kotlintest.shouldNotBe
 import io.kotlintest.shouldThrow
 import io.micronaut.test.annotation.MicronautTest
-import micronaut.bookman.RepositoryCollection
 import micronaut.bookman.SpecWithDataSource
-import micronaut.bookman.domain.book.BookRepository
+import micronaut.bookman.domain.book.Book
 import micronaut.bookman.domain.book.error.NoBookException
+import micronaut.bookman.domain.time.ServerDateTimeFactory
+import micronaut.bookman.infra.book.DBBookRepository
 import java.util.*
+import javax.sql.DataSource
 
 @MicronautTest
-class LibrarianBookUseCaseTest(
-        private val repositoryCollection: RepositoryCollection,
-        private val repository: BookRepository
-) : SpecWithDataSource(repositoryCollection, {
-    val useCase = LibrarianBookUseCase(repository)
+class LibrarianBookUseCaseTest(private val source: DataSource) : SpecWithDataSource(source, {
+    val factory = Book.Factory(ServerDateTimeFactory())
+    val useCase = LibrarianBookUseCase(
+            factory,
+            DBBookRepository(source, factory)
+    )
 
     "Librarian can create a book" {
         val title = "Book (${UUID.randomUUID()})"
@@ -37,7 +40,7 @@ class LibrarianBookUseCaseTest(
     }
 
     "Librarian cannot get a book with invalid ID" {
-        val id = UUID.randomUUID()
+        val id = UUID.randomUUID().toString()
         shouldThrow<NoBookException> {
             useCase.getBook(id)
         }
@@ -49,7 +52,7 @@ class LibrarianBookUseCaseTest(
     }
 
     "Librarian cannot delete a book with invalid ID" {
-        val id = UUID.randomUUID()
+        val id = UUID.randomUUID().toString()
         shouldThrow<NoBookException> {
             useCase.deleteBook(id)
         }
@@ -64,7 +67,7 @@ class LibrarianBookUseCaseTest(
     }
 
     "Librarian cannot update a title with invalid ID" {
-        val id = UUID.randomUUID()
+        val id = UUID.randomUUID().toString()
         shouldThrow<NoBookException> {
             useCase.patchBook(id, "new title")
         }
