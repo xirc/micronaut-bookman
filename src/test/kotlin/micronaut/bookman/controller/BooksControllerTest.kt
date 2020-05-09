@@ -7,13 +7,13 @@ import io.kotlintest.specs.StringSpec
 import io.micronaut.context.ApplicationContext
 import io.micronaut.runtime.server.EmbeddedServer
 import io.micronaut.test.annotation.MicronautTest
-import micronaut.bookman.controller.book.BookResponseBody
 import micronaut.bookman.controller.book.BooksClient
 import micronaut.bookman.controller.book.CreateBookRequest
 import micronaut.bookman.controller.book.PatchBookRequest
 import micronaut.bookman.controller.person.CreatePersonRequest
-import micronaut.bookman.controller.person.PersonResponseBody
 import micronaut.bookman.controller.person.PersonsClient
+import micronaut.bookman.usecase.BookDto
+import micronaut.bookman.usecase.PersonDto
 import java.util.*
 
 @MicronautTest
@@ -22,12 +22,12 @@ class BooksControllerTest(ctx: ApplicationContext): StringSpec({
     val client = embeddedServer.applicationContext.getBean(BooksClient::class.java)
     val personClient = embeddedServer.applicationContext.getBean(PersonsClient::class.java)
 
-    fun createFixture(): BookResponseBody {
+    fun createFixture(): BookDto {
         val title = "title ${UUID.randomUUID()}"
         val response = client.create(CreateBookRequest(title))
         return response.body()?.value!!
     }
-    fun createPerson(): PersonResponseBody {
+    fun createPerson(): PersonDto {
         val firstName = "first"
         val lastName = "last"
         val response = personClient.create(CreatePersonRequest(firstName, lastName))

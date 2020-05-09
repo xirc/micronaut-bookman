@@ -26,7 +26,8 @@ class LibrarianPersonUseCaseTest(
     "Librarian can create a person" {
         val name = FullName("Harry", "Potter")
         val person = useCase.createPerson(name)
-        person.name shouldBe name
+        person.firstName shouldBe name.firstName
+        person.lastName shouldBe name.lastName
     }
 
     "Librarian should create persons that have different IDs" {
@@ -39,7 +40,9 @@ class LibrarianPersonUseCaseTest(
     "Librarian can get a person" {
         val person = useCase.createPerson(FullName("Harry", "Potter"))
         val referencePerson = useCase.getPerson(person.id)
-        referencePerson.name shouldBe person.name
+        referencePerson.id shouldBe person.id
+        referencePerson.firstName shouldBe person.firstName
+        referencePerson.lastName shouldBe person.lastName
     }
 
     "Librarian cannot get a person with invalid ID" {
@@ -67,8 +70,8 @@ class LibrarianPersonUseCaseTest(
         val newFirstName = "first"
         val newPerson = useCase.patchPerson(person.id, newFirstName, null)
         newPerson.id shouldBe person.id
-        newPerson.name.firstName shouldBe newFirstName
-        newPerson.name.lastName shouldBe name.lastName
+        newPerson.firstName shouldBe newFirstName
+        newPerson.lastName shouldBe name.lastName
     }
 
     "Librarian can update last name of a person" {
@@ -77,8 +80,8 @@ class LibrarianPersonUseCaseTest(
         val newLastName = "last"
         val newPerson = useCase.patchPerson(person.id, null, newLastName)
         newPerson.id shouldBe person.id
-        newPerson.name.firstName shouldBe name.firstName
-        newPerson.name.lastName shouldBe newLastName
+        newPerson.firstName shouldBe name.firstName
+        newPerson.lastName shouldBe newLastName
     }
 
     "Librarian cannot update name of a person with invalid ID" {

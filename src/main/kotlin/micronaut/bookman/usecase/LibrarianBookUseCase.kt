@@ -3,7 +3,6 @@ package micronaut.bookman.usecase
 import micronaut.bookman.domain.book.Book
 import micronaut.bookman.domain.book.BookAuthor
 import micronaut.bookman.domain.book.BookRepository
-import micronaut.bookman.domain.person.Person
 import micronaut.bookman.domain.person.PersonRepository
 import javax.inject.Singleton
 
@@ -13,19 +12,17 @@ class LibrarianBookUseCase(
         private val repository: BookRepository,
         private val personRepository: PersonRepository
 ) {
-    data class BookDTO(val book: Book, val author: Person?)
-
-    fun getBook(id: String): BookDTO {
+    fun getBook(id: String): BookDto {
         val book = repository.get(id)
-        val person = book.author?.let { personRepository.get(it.personId) }
-        return BookDTO(book, person)
+        val author = book.author?.let { personRepository.get(it.personId) }
+        return BookDto.createFrom(book, author)
     }
 
-    fun createBook(title: String): BookDTO {
+    fun createBook(title: String): BookDto {
         val book = factory.create()
         book.updateTitle(title)
         val savedBook = repository.save(book)
-        return BookDTO(savedBook, null)
+        return BookDto.createFrom(savedBook, null)
     }
 
     fun deleteBook(id: String) {
@@ -36,7 +33,7 @@ class LibrarianBookUseCase(
             id: String,
             title: String? = null,
             authorId: String? = null
-    ): BookDTO {
+    ): BookDto {
         val book = repository.get(id)
         if (title != null) {
             book.updateTitle(title)
@@ -46,6 +43,6 @@ class LibrarianBookUseCase(
         }
         val updatedBook = repository.update(book)
         val author = book.author?.let { personRepository.get(it.personId) }
-        return BookDTO(updatedBook, author)
+        return BookDto.createFrom(updatedBook, author)
     }
 }

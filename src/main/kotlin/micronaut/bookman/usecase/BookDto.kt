@@ -1,22 +1,21 @@
-package micronaut.bookman.controller.book
+package micronaut.bookman.usecase
 
-import micronaut.bookman.controller.person.PersonResponseBody
 import micronaut.bookman.domain.book.Book
 import micronaut.bookman.domain.person.Person
 import org.joda.time.DateTime
 
-data class BookResponseBody private constructor(
+data class BookDto private constructor(
         val id: String,
         val title: String,
-        val author: PersonResponseBody?,
+        val author: PersonDto?,
         val createdDate: DateTime,
         val updatedDate: DateTime
 ) {
     companion object {
-        fun createFrom(book: Book, author: Person?) = BookResponseBody(
+        fun createFrom(book: Book, author: Person?) = BookDto(
                 book.id,
                 book.title,
-                author?.let { PersonResponseBody.createFrom(it) },
+                author?.let { PersonDto.createFrom(it) },
                 book.createdDate,
                 book.updatedDate
         )
