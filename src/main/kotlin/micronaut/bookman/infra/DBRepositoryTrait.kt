@@ -1,6 +1,7 @@
 package micronaut.bookman.infra
 
 import micronaut.bookman.infra.error.InfraException
+import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.joda.time.DateTimeZone
 import java.lang.IllegalStateException
 import java.sql.SQLException
@@ -14,6 +15,9 @@ interface DBRepositoryTrait {
             // Transaction が存在しない場合に SQL を実行しようとすると起きるため
             throw InfraException(e)
         } catch (e: SQLException) {
+            // データベースの制約を満たしていない場合などに起きるため
+            throw InfraException(e)
+        } catch (e: ExposedSQLException) {
             // データベースの制約を満たしていない場合などに起きるため
             throw InfraException(e)
         }

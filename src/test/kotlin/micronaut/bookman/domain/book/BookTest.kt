@@ -1,6 +1,7 @@
 package micronaut.bookman.domain.book
 
 import io.kotlintest.shouldBe
+import io.kotlintest.shouldNotBe
 import io.kotlintest.shouldThrow
 import io.kotlintest.specs.StringSpec
 import io.micronaut.test.annotation.MicronautTest
@@ -57,6 +58,17 @@ class BookTest : StringSpec({
         shouldThrow<IllegalBookStateException> {
             book.updateTitle("TITLE ${UUID.randomUUID()}")
         }
+    }
+
+    "Book can have a author" {
+        val book = swFactory.create()
+        val personId = UUID.randomUUID().toString()
+        // 更新日時が新しくなるか確認するため時間を進める
+        timeFactory.value = timeFactory.value.plusMillis(1)
+        book.updateAuthor(BookAuthor(personId))
+        book.author shouldNotBe null
+        book.author?.personId shouldBe personId
+        book.updatedDate shouldBe timeFactory.value
     }
 
 })
