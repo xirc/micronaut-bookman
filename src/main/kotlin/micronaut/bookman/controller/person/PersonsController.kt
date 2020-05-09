@@ -5,18 +5,13 @@ import io.micronaut.http.annotation.Controller
 import micronaut.bookman.controller.PersonErrorResponseSyntax.toResponseBody
 import micronaut.bookman.controller.UnitResponse
 import micronaut.bookman.domain.person.FullName
-import micronaut.bookman.domain.person.Person
 import micronaut.bookman.domain.person.error.NoPersonException
-import micronaut.bookman.domain.time.ServerDateTimeFactory
-import micronaut.bookman.infra.person.DBPersonRepository
 import micronaut.bookman.usecase.LibrarianPersonUseCase
-import javax.sql.DataSource
 
 @Controller("/persons")
-class PersonsController(val source: DataSource) : PersonsApi {
-    private val factory = Person.Factory(ServerDateTimeFactory())
-    private val repository = DBPersonRepository(source, factory)
-    private val useCase = LibrarianPersonUseCase(factory, repository)
+class PersonsController(
+        private val useCase: LibrarianPersonUseCase
+) : PersonsApi {
 
     override fun create(request: CreatePersonRequest): HttpResponse<PersonResponse> {
         val person = useCase.createPerson(

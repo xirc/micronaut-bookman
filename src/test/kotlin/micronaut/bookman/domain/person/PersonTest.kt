@@ -9,7 +9,6 @@ import micronaut.bookman.domain.ConstantDateTimeFactory
 import micronaut.bookman.domain.person.error.IllegalPersonStateException
 import micronaut.bookman.domain.time.ServerDateTimeFactory
 import org.joda.time.DateTime
-import java.util.*
 
 @MicronautTest
 class PersonTest : StringSpec({

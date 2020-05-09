@@ -3,7 +3,9 @@ package micronaut.bookman.usecase
 import micronaut.bookman.domain.person.FullName
 import micronaut.bookman.domain.person.Person
 import micronaut.bookman.domain.person.PersonRepository
+import javax.inject.Singleton
 
+@Singleton
 class LibrarianPersonUseCase(
         private val factory: Person.Factory,
         private val repository: PersonRepository

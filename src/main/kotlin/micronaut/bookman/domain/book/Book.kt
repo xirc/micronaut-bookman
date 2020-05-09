@@ -4,6 +4,7 @@ import micronaut.bookman.domain.book.error.IllegalBookStateException
 import micronaut.bookman.domain.time.DateTimeFactory
 import org.joda.time.DateTime
 import java.util.*
+import javax.inject.Singleton
 
 class Book private constructor(val id: String, val createdDate: DateTime, private val timeFactory: DateTimeFactory) {
     var title: String = ""
@@ -26,6 +27,7 @@ class Book private constructor(val id: String, val createdDate: DateTime, privat
         this.updatedDate = timeFactory.now()
     }
 
+    @Singleton
     class Factory(private val timeFactory: DateTimeFactory) {
         fun create() = Book(UUID.randomUUID().toString(), timeFactory.now(), timeFactory)
         fun createFromRepository(

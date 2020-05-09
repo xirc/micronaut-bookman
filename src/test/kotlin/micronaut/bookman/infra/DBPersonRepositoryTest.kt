@@ -9,14 +9,15 @@ import micronaut.bookman.domain.person.FullName
 import micronaut.bookman.domain.person.Person
 import micronaut.bookman.domain.person.error.DuplicatePersonException
 import micronaut.bookman.domain.person.error.NoPersonException
-import micronaut.bookman.domain.time.ServerDateTimeFactory
 import micronaut.bookman.infra.person.DBPersonRepository
 import java.util.*
 import javax.sql.DataSource
 
 @MicronautTest
-class DBPersonRepositoryTest(private val source: DataSource) : SpecWithDataSource(source, {
-    val factory = Person.Factory(ServerDateTimeFactory())
+class DBPersonRepositoryTest(
+        private val source: DataSource,
+        private val factory: Person.Factory
+) : SpecWithDataSource(source, {
     val repository = DBPersonRepository(source, factory)
 
     fun createFixture(): Person {
