@@ -11,3 +11,7 @@
 ## Development Environment
 * Kubernates
 * Skaffold
+
+## NOTE
+
+* MySQL の TimeZone は UTC にすること
