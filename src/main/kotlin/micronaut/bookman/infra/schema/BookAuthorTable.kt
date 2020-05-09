@@ -1,6 +1,5 @@
-package micronaut.bookman.infra.book
+package micronaut.bookman.infra.schema
 
-import micronaut.bookman.infra.person.PersonTable
 import org.jetbrains.exposed.sql.Table
 
 object BookAuthorTable : Table() {

@@ -6,6 +6,8 @@ import micronaut.bookman.domain.book.BookRepository
 import micronaut.bookman.domain.book.error.DuplicateBookException
 import micronaut.bookman.domain.book.error.NoBookException
 import micronaut.bookman.domain.person.error.NoPersonException
+import micronaut.bookman.infra.schema.BookAuthorTable
+import micronaut.bookman.infra.schema.BookTable
 import micronaut.bookman.infra.DBRepositoryTrait
 import micronaut.bookman.infra.error.IllegalDatabaseSchema
 import micronaut.bookman.infra.error.InfraException
