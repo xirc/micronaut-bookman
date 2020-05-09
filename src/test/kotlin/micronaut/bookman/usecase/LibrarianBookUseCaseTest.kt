@@ -35,21 +35,21 @@ class LibrarianBookUseCaseTest(
 
     "Librarian can create a book" {
         val title = "Book (${UUID.randomUUID()})"
-        val res = useCase.createBook(title)
-        res.book.title shouldBe title
+        val book = useCase.createBook(title)
+        book.title shouldBe title
     }
 
     "Librarian should create books that have different IDs" {
-        val res1 = useCase.createBook("TITLE ${UUID.randomUUID()}")
-        val res2 = useCase.createBook("TITLE ${UUID.randomUUID()}")
-        res1.book.id shouldNotBe res2.book.id
+        val book1 = useCase.createBook("TITLE ${UUID.randomUUID()}")
+        val book2 = useCase.createBook("TITLE ${UUID.randomUUID()}")
+        book1.id shouldNotBe book2.id
     }
 
     "Librarian can get a book" {
         val title = "TITLE ${UUID.randomUUID()}"
-        val res = useCase.createBook(title)
-        val newRes = useCase.getBook(res.book.id)
-        newRes.book.title shouldBe title
+        val book = useCase.createBook(title)
+        val fetchedBook = useCase.getBook(book.id)
+        fetchedBook.title shouldBe title
     }
 
     "Librarian cannot get a book with invalid ID" {
@@ -60,8 +60,8 @@ class LibrarianBookUseCaseTest(
     }
 
     "Librarian can delete a book" {
-        val res = useCase.createBook("TITLE ${UUID.randomUUID()}")
-        useCase.deleteBook(res.book.id)
+        val book = useCase.createBook("TITLE ${UUID.randomUUID()}")
+        useCase.deleteBook(book.id)
     }
 
     "Librarian cannot delete a book with invalid ID" {
@@ -72,11 +72,11 @@ class LibrarianBookUseCaseTest(
     }
 
     "Librarian can update a title of a book" {
-        val res = useCase.createBook("title")
+        val book = useCase.createBook("title")
         val newTitle = "new book title"
-        val newRes = useCase.patchBook(res.book.id, newTitle)
-        newRes.book.id shouldBe newRes.book.id
-        newRes.book.title shouldBe newTitle
+        val newBook = useCase.patchBook(book.id, newTitle)
+        newBook.id shouldBe book.id
+        newBook.title shouldBe newTitle
     }
 
     "Librarian cannot update a title with invalid ID" {
@@ -87,15 +87,15 @@ class LibrarianBookUseCaseTest(
     }
 
     "Librarian can update author of a book" {
-        val bookRes = useCase.createBook("book title")
+        val book = useCase.createBook("book title")
         val person = personUseCase.createPerson(FullName("Harry", "Potter"))
-        val newRes = useCase.patchBook(bookRes.book.id, authorId = person.id)
-        newRes.book.author shouldNotBe null
-        newRes.book.author?.personId shouldBe person.id
+        val newBook = useCase.patchBook(book.id, authorId = person.id)
+        newBook.author shouldNotBe null
+        newBook.author?.id shouldBe person.id
     }
 
     "Librarian can update nothing" {
-        val book = useCase.createBook("a book").book
+        val book = useCase.createBook("a book")
         val person = personUseCase.createPerson(FullName("abc", "def"))
         useCase.patchBook(book.id, null, person.id)
     }

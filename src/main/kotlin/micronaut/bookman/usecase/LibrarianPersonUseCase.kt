@@ -10,21 +10,22 @@ class LibrarianPersonUseCase(
         private val factory: Person.Factory,
         private val repository: PersonRepository
 ) {
-    fun getPerson(id: String): Person {
-        return repository.get(id)
+    fun getPerson(id: String): PersonDto {
+        val person = repository.get(id)
+        return PersonDto.createFrom(person)
     }
 
-    fun createPerson(name: FullName): Person {
+    fun createPerson(name: FullName): PersonDto {
         val person = factory.create(name)
         repository.save(person)
-        return person
+        return PersonDto.createFrom(person)
     }
 
     fun deletePerson(id: String) {
         repository.delete(id)
     }
 
-    fun patchPerson(id: String, firstName: String?, lastName: String?): Person {
+    fun patchPerson(id: String, firstName: String?, lastName: String?): PersonDto {
         val person = repository.get(id)
         firstName?.run {
             person.updateFirstName(firstName)
@@ -33,6 +34,6 @@ class LibrarianPersonUseCase(
             person.updateLastName(lastName)
         }
         repository.update(person)
-        return person
+        return PersonDto.createFrom(person)
     }
 }

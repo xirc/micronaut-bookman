@@ -1,9 +1,9 @@
-package micronaut.bookman.controller.person
+package micronaut.bookman.usecase
 
 import micronaut.bookman.domain.person.Person
 import org.joda.time.DateTime
 
-data class PersonResponseBody private constructor(
+data class PersonDto private constructor(
         val id: String,
         val firstName: String,
         val lastName: String,
@@ -11,7 +11,7 @@ data class PersonResponseBody private constructor(
         val updatedDate: DateTime
 ) {
     companion object {
-        fun createFrom(person: Person) = PersonResponseBody(
+        fun createFrom(person: Person) = PersonDto(
                 person.id,
                 person.name.firstName,
                 person.name.lastName,
