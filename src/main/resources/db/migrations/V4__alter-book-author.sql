@@ -1,0 +1,1 @@
+ALTER TABLE book_author MODIFY person_id VARCHAR(36) NOT NULL;
