@@ -11,8 +11,11 @@ class Person private constructor(
     var name: FullName = FullName("", "")
         private set
 
-    fun updateName(newName: FullName) {
-        name = newName
+    fun updateFirstName(firstName: String) {
+        name = name.copy(firstName = firstName)
+    }
+    fun updateLastName(lastName: String) {
+        name = name.copy(lastName = lastName)
     }
 
     companion object {
