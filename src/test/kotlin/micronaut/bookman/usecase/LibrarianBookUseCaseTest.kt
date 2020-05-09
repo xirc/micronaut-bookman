@@ -7,36 +7,46 @@ import io.micronaut.test.annotation.MicronautTest
 import micronaut.bookman.SpecWithDataSource
 import micronaut.bookman.domain.book.Book
 import micronaut.bookman.domain.book.error.NoBookException
+import micronaut.bookman.domain.person.FullName
+import micronaut.bookman.domain.person.Person
 import micronaut.bookman.domain.time.ServerDateTimeFactory
 import micronaut.bookman.infra.book.DBBookRepository
+import micronaut.bookman.infra.person.DBPersonRepository
 import java.util.*
 import javax.sql.DataSource
 
 @MicronautTest
 class LibrarianBookUseCaseTest(private val source: DataSource) : SpecWithDataSource(source, {
     val factory = Book.Factory(ServerDateTimeFactory())
+    val personFactory = Person.Factory(ServerDateTimeFactory())
+    val personRepository = DBPersonRepository(source, personFactory)
     val useCase = LibrarianBookUseCase(
             factory,
-            DBBookRepository(source, factory)
+            DBBookRepository(source, factory),
+            personRepository
+    )
+    val personUseCase = LibrarianPersonUseCase(
+            Person.Factory(ServerDateTimeFactory()),
+            personRepository
     )
 
     "Librarian can create a book" {
         val title = "Book (${UUID.randomUUID()})"
-        val book = useCase.createBook(title)
-        book.title shouldBe title
+        val res = useCase.createBook(title)
+        res.book.title shouldBe title
     }
 
     "Librarian should create books that have different IDs" {
-        val book1 = useCase.createBook("TITLE ${UUID.randomUUID()}")
-        val book2 = useCase.createBook("TITLE ${UUID.randomUUID()}")
-        book1.id shouldNotBe book2.id
+        val res1 = useCase.createBook("TITLE ${UUID.randomUUID()}")
+        val res2 = useCase.createBook("TITLE ${UUID.randomUUID()}")
+        res1.book.id shouldNotBe res2.book.id
     }
 
     "Librarian can get a book" {
         val title = "TITLE ${UUID.randomUUID()}"
-        val book = useCase.createBook(title)
-        val referenceBook = useCase.getBook(book.id)
-        referenceBook.title shouldBe title
+        val res = useCase.createBook(title)
+        val newRes = useCase.getBook(res.book.id)
+        newRes.book.title shouldBe title
     }
 
     "Librarian cannot get a book with invalid ID" {
@@ -47,8 +57,8 @@ class LibrarianBookUseCaseTest(private val source: DataSource) : SpecWithDataSou
     }
 
     "Librarian can delete a book" {
-        val book = useCase.createBook("TITLE ${UUID.randomUUID()}")
-        useCase.deleteBook(book.id)
+        val res = useCase.createBook("TITLE ${UUID.randomUUID()}")
+        useCase.deleteBook(res.book.id)
     }
 
     "Librarian cannot delete a book with invalid ID" {
@@ -59,11 +69,11 @@ class LibrarianBookUseCaseTest(private val source: DataSource) : SpecWithDataSou
     }
 
     "Librarian can update a title of a book" {
-        val book = useCase.createBook("title")
+        val res = useCase.createBook("title")
         val newTitle = "new book title"
-        val newBook = useCase.patchBook(book.id, newTitle)
-        newBook.id shouldBe book.id
-        newBook.title shouldBe newTitle
+        val newRes = useCase.patchBook(res.book.id, newTitle)
+        newRes.book.id shouldBe newRes.book.id
+        newRes.book.title shouldBe newTitle
     }
 
     "Librarian cannot update a title with invalid ID" {
@@ -72,4 +82,13 @@ class LibrarianBookUseCaseTest(private val source: DataSource) : SpecWithDataSou
             useCase.patchBook(id, "new title")
         }
     }
+
+    "Librarian can update author of a book" {
+        val bookRes = useCase.createBook("book title")
+        val person = personUseCase.createPerson(FullName("Harry", "Potter"))
+        val newRes = useCase.patchBook(bookRes.book.id, authorId = person.id)
+        newRes.book.author shouldNotBe null
+        newRes.book.author?.personId shouldBe person.id
+    }
+
 })

@@ -7,9 +7,9 @@ import io.micronaut.test.annotation.MicronautTest
 import micronaut.bookman.SpecWithDataSource
 import micronaut.bookman.domain.person.FullName
 import micronaut.bookman.domain.person.Person
+import micronaut.bookman.domain.person.error.DuplicatePersonException
 import micronaut.bookman.domain.person.error.NoPersonException
 import micronaut.bookman.domain.time.ServerDateTimeFactory
-import micronaut.bookman.infra.error.InfraException
 import micronaut.bookman.infra.person.DBPersonRepository
 import java.util.*
 import javax.sql.DataSource
@@ -21,22 +21,22 @@ class DBPersonRepositoryTest(private val source: DataSource) : SpecWithDataSourc
 
     fun createFixture(): Person {
         val person = factory.create(FullName("Harry", "Potter"))
-        repository.post(person)
+        repository.save(person)
         return person
     }
 
-    "DBPersonRepository can post a person" {
+    "DBPersonRepository can create a person" {
         val person = factory.create(FullName("Harry", "Potter"))
-        repository.post(person)
+        repository.save(person)
     }
 
-    "DBPersonRepository cannot post a person twice" {
+    "DBPersonRepository cannot create a person twice" {
         val person = factory.create(FullName("Harry", "Potter"))
         shouldNotThrowAny {
-            repository.post(person)
+            repository.save(person)
         }
-        shouldThrow<InfraException> {
-            repository.post(person)
+        shouldThrow<DuplicatePersonException> {
+            repository.save(person)
         }
     }
 
@@ -58,11 +58,11 @@ class DBPersonRepositoryTest(private val source: DataSource) : SpecWithDataSourc
         }
     }
 
-    "DBPersonRepository can put a person" {
+    "DBPersonRepository can update a person" {
         val person = createFixture()
         person.updateFirstName("Ronald")
         person.updateLastName("Weasley")
-        repository.put(person)
+        repository.update(person)
         val newPerson = repository.get(person.id)
         newPerson.run {
             id shouldBe person.id
@@ -72,10 +72,10 @@ class DBPersonRepositoryTest(private val source: DataSource) : SpecWithDataSourc
         }
     }
 
-    "DBPersonRepository cannot put a person with invalid ID" {
+    "DBPersonRepository cannot update a person with invalid ID" {
         val person = factory.create(FullName("Harry", "Potter"))
         shouldThrow<NoPersonException> {
-            repository.put(person)
+            repository.update(person)
         }
     }
 

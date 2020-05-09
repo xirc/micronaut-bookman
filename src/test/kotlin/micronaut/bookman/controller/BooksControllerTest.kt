@@ -1,7 +1,6 @@
 package micronaut.bookman.controller
 
 import io.kotlintest.shouldBe
-import io.kotlintest.shouldNot
 import io.kotlintest.shouldNotBe
 import io.micronaut.http.HttpStatus
 import io.kotlintest.specs.StringSpec
@@ -12,16 +11,26 @@ import micronaut.bookman.controller.book.BookResponseBody
 import micronaut.bookman.controller.book.BooksClient
 import micronaut.bookman.controller.book.CreateBookRequest
 import micronaut.bookman.controller.book.PatchBookRequest
+import micronaut.bookman.controller.person.CreatePersonRequest
+import micronaut.bookman.controller.person.PersonResponseBody
+import micronaut.bookman.controller.person.PersonsClient
 import java.util.*
 
 @MicronautTest
 class BooksControllerTest(ctx: ApplicationContext): StringSpec({
     val embeddedServer: EmbeddedServer = ctx.getBean(EmbeddedServer::class.java)
     val client = embeddedServer.applicationContext.getBean(BooksClient::class.java)
+    val personClient = embeddedServer.applicationContext.getBean(PersonsClient::class.java)
 
     fun createFixture(): BookResponseBody {
         val title = "title ${UUID.randomUUID()}"
         val response = client.create(CreateBookRequest(title))
+        return response.body()?.value!!
+    }
+    fun createPerson(): PersonResponseBody {
+        val firstName = "first"
+        val lastName = "last"
+        val response = personClient.create(CreatePersonRequest(firstName, lastName))
         return response.body()?.value!!
     }
 
@@ -89,7 +98,7 @@ class BooksControllerTest(ctx: ApplicationContext): StringSpec({
     "Book Controller can update a book title" {
         val book = createFixture()
         val newTitle = "new book title"
-        val response = client.patch(book.id, PatchBookRequest(newTitle))
+        val response = client.patch(book.id, PatchBookRequest(newTitle, null))
         response.status shouldBe HttpStatus.OK
         response.body()!!.run {
             error shouldBe null
@@ -101,12 +110,26 @@ class BooksControllerTest(ctx: ApplicationContext): StringSpec({
 
     "Book Controller cannot update a book title with invalid ID" {
         val id = UUID.randomUUID().toString()
-        val response = client.patch(id, PatchBookRequest("new title"))
+        val response = client.patch(id, PatchBookRequest("new title", null))
         response.status shouldBe HttpStatus.OK
         response.body()!!.run {
             value shouldBe null
             error shouldNotBe null
             error?.id shouldBe ErrorCode.BOOK_NOT_FOUND
+        }
+    }
+
+    "BookController can update author of a book" {
+        val book = createFixture()
+        val person = createPerson()
+        val response = client.patch(book.id, PatchBookRequest(null, person.id))
+        response.status shouldBe HttpStatus.OK
+        response.body()!!.run {
+            error shouldBe null
+            value shouldNotBe null
+            value?.id shouldBe book.id
+            value?.author shouldNotBe null
+            value?.author?.id shouldBe person.id
         }
     }
 

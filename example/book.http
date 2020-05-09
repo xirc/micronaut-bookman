@@ -21,5 +21,6 @@ PATCH {{url}}/books/{{book1.response.body.$.value.id}}
 Content-Type: {{type}}
 
 {
-    "title": "a new book title"
+    "title": "a new book title",
+    "authorId": null
 }
