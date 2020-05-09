@@ -23,14 +23,12 @@ class LibrarianPersonUseCase(
 
     fun patchPerson(id: UUID, firstName: String?, lastName: String?): Person {
         val person = repository.get(id)
-        var newName = person.name
         firstName?.run {
-            newName = newName.copy(firstName = firstName)
+            person.updateFirstName(firstName)
         }
         lastName?.run {
-            newName = newName.copy(lastName = lastName)
+            person.updateLastName(lastName)
         }
-        person.updateName(newName)
         return repository.update(person)
     }
 }

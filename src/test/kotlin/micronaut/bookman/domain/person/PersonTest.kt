@@ -21,17 +21,27 @@ class PersonTest : StringSpec({
         person1.id shouldNotBe person2.id
     }
 
-    "Person can change his/her name" {
+    "Person can change his/her first name" {
         val name = FullName("Harry", "Potter")
         val person = Person.create(name)
-        val id = person.id
-        person.name shouldBe name
 
-        val newName = FullName("Ronald", "Weasley")
-        person.updateName(newName)
+        val newFirstName = "Ronald"
+        person.updateFirstName(newFirstName)
         person.also {
-            it.id shouldBe id
-            it.name shouldBe newName
+            it.name.firstName shouldBe newFirstName
+            it.name.lastName shouldBe name.lastName
+        }
+    }
+
+    "Person can change his/her last name" {
+        val name = FullName("Harry", "Potter")
+        val person = Person.create(name)
+
+        val newLastName = "Weasley"
+        person.updateLastName(newLastName)
+        person.also {
+            it.name.firstName shouldBe name.firstName
+            it.name.lastName shouldBe newLastName
         }
     }
 
