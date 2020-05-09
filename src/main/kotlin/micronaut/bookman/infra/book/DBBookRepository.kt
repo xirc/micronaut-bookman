@@ -44,7 +44,7 @@ class DBBookRepository(
         }
     }
 
-    override fun post(book: Book) {
+    override fun save(book: Book): Book {
         return transaction (Database.connect(source)) {
             catchingKnownException {
                 withUtcZone {
@@ -60,12 +60,13 @@ class DBBookRepository(
                             it[person_id] = author.personId
                         }
                     }
+                    book
                 }
             }
         }
     }
 
-    override fun put(book: Book) {
+    override fun update(book: Book): Book {
         return transaction (Database.connect(source)) {
             catchingKnownException {
                 withUtcZone {
@@ -85,12 +86,13 @@ class DBBookRepository(
                             it[person_id] = author.personId
                         }
                     }
+                    book
                 }
             }
         }
     }
 
-    override fun delete(id: String) {
+    override fun delete(id: String): Unit {
         return transaction (Database.connect(source)) {
             catchingKnownException {
                 BookAuthorTable.deleteWhere { BookAuthorTable.book_id eq id }

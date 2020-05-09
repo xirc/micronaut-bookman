@@ -10,7 +10,6 @@ import micronaut.bookman.domain.book.BookAuthor
 import micronaut.bookman.domain.book.error.NoBookException
 import micronaut.bookman.domain.person.FullName
 import micronaut.bookman.domain.person.Person
-import micronaut.bookman.domain.person.error.NoPersonException
 import micronaut.bookman.domain.time.ServerDateTimeFactory
 import micronaut.bookman.infra.book.DBBookRepository
 import micronaut.bookman.infra.error.InfraException
@@ -27,22 +26,22 @@ class DBBookRepositoryTest(private val source: DataSource) : SpecWithDataSource(
 
     fun createFixture(): Book {
         val book = factory.create()
-        repository.post(book)
+        repository.save(book)
         return book
     }
 
     "DBBookRepository can post a book" {
         val book = factory.create()
-        repository.post(book)
+        repository.save(book)
     }
 
     "DBBookRepository cannot create a post twice" {
         val book = factory.create()
         shouldNotThrowAny {
-            repository.post(book)
+            repository.save(book)
         }
         shouldThrow<InfraException> {
-            repository.post(book)
+            repository.save(book)
         }
     }
 
@@ -84,14 +83,14 @@ class DBBookRepositoryTest(private val source: DataSource) : SpecWithDataSource(
 
     "DBBookRepository can update a book" {
         val book = factory.create()
-        repository.post(book)
+        repository.save(book)
         val person = personFactory.create(FullName("Harry", "Potter"))
         personRepository.post(person)
         val newTitle = "a new title"
 
         book.updateTitle(newTitle)
         book.updateAuthor(BookAuthor(person.id))
-        repository.put(book)
+        repository.update(book)
 
         val newBook = repository.get(book.id)
         newBook.title shouldBe newTitle
@@ -102,15 +101,15 @@ class DBBookRepositoryTest(private val source: DataSource) : SpecWithDataSource(
         val book = factory.create()
         book.updateAuthor(BookAuthor(UUID.randomUUID().toString()))
         shouldThrow<NoBookException> {
-            repository.put(book)
+            repository.update(book)
         }
 
-        repository.post(book)
+        repository.save(book)
 
         shouldThrow<InfraException> {
             val personId = UUID.randomUUID().toString()
             book.updateAuthor(BookAuthor(personId))
-            repository.put(book)
+            repository.update(book)
         }
     }
 

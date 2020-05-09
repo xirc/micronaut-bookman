@@ -22,8 +22,8 @@ class LibrarianBookUseCase(
     fun createBook(title: String): BookDTO {
         val book = factory.create()
         book.updateTitle(title)
-        repository.post(book)
-        return BookDTO(book, null)
+        val savedBook = repository.save(book)
+        return BookDTO(savedBook, null)
     }
 
     fun deleteBook(id: String) {
@@ -43,7 +43,7 @@ class LibrarianBookUseCase(
             book.updateAuthor(BookAuthor(authorId))
             personRepository.get(authorId)
         }
-        repository.put(book)
-        return BookDTO(book, author)
+        val updatedBook = repository.update(book)
+        return BookDTO(updatedBook, author)
     }
 }
