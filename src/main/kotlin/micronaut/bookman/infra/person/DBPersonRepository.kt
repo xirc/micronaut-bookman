@@ -42,7 +42,7 @@ class DBPersonRepository(
         }
     }
 
-    override fun post(person: Person) {
+    override fun save(person: Person): Person {
         return transaction (Database.connect(source)) {
             withUtcZone {
                 try {
@@ -60,11 +60,12 @@ class DBPersonRepository(
                         throw InfraException(e)
                     }
                 }
+                person
             }
         }
     }
 
-    override fun put(person: Person) {
+    override fun update(person: Person): Person {
         return transaction (Database.connect(source)) {
             withUtcZone {
                 val count = PersonTable.update({ PersonTable.id eq person.id }) {
@@ -78,6 +79,7 @@ class DBPersonRepository(
                     1 -> Unit
                     else -> throw IllegalDatabaseSchema("Table ${PersonTable.tableName} has illegal schema.")
                 }
+                person
             }
         }
     }

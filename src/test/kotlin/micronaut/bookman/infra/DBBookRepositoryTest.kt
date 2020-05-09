@@ -32,7 +32,7 @@ class DBBookRepositoryTest(private val source: DataSource) : SpecWithDataSource(
         return book
     }
 
-    "DBBookRepository can post a book" {
+    "DBBookRepository can create a book" {
         val book = factory.create()
         repository.save(book)
     }
@@ -87,7 +87,7 @@ class DBBookRepositoryTest(private val source: DataSource) : SpecWithDataSource(
         val book = factory.create()
         repository.save(book)
         val person = personFactory.create(FullName("Harry", "Potter"))
-        personRepository.post(person)
+        personRepository.save(person)
         val newTitle = "a new title"
 
         book.updateTitle(newTitle)

@@ -14,7 +14,7 @@ class LibrarianPersonUseCase(
 
     fun createPerson(name: FullName): Person {
         val person = factory.create(name)
-        repository.post(person)
+        repository.save(person)
         return person
     }
 
@@ -30,7 +30,7 @@ class LibrarianPersonUseCase(
         lastName?.run {
             person.updateLastName(lastName)
         }
-        repository.put(person)
+        repository.update(person)
         return person
     }
 }
