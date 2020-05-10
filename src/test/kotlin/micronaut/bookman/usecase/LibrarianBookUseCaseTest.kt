@@ -54,6 +54,15 @@ class LibrarianBookUseCaseTest(
         book1.id shouldNotBe book2.id
     }
 
+    "Librarian can create a book with authors" {
+        val person1 = personUseCase.createPerson()
+        val person2 = personUseCase.createPerson()
+        val book = useCase.createBook(authorIds = listOf(person1.id, person2.id))
+        book.authors.size shouldBe 2
+        book.authors.map { it.id } shouldContain person1.id
+        book.authors.map { it.id } shouldContain person2.id
+    }
+
     "Librarian can get a book" {
         val title = "TITLE ${UUID.randomUUID()}"
         val book = useCase.createBook(title)

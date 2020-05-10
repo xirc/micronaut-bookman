@@ -19,11 +19,15 @@ class LibrarianBookUseCase(
         return BookDto.createFrom(book, authors)
     }
 
-    fun createBook(title: String? = null): BookDto {
+    fun createBook(title: String? = null, authorIds: List<String>? = null): BookDto {
         val book = factory.create()
         book.updateTitle(title ?: "")
+        authorIds?.also {
+            book.updateAuthors(it.map { id -> BookAuthor(id) })
+        }
         val savedBook = repository.save(book)
-        return BookDto.createFrom(savedBook, emptyList())
+        val authors = personRepository.getAll(savedBook.authors.map { it.personId })
+        return BookDto.createFrom(savedBook, authors)
     }
 
     fun deleteBook(id: String) {
