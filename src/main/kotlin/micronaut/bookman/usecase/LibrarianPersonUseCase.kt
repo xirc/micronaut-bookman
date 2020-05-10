@@ -15,7 +15,8 @@ class LibrarianPersonUseCase(
         return PersonDto.createFrom(person)
     }
 
-    fun createPerson(name: FullName): PersonDto {
+    fun createPerson(firstName: String? = null, lastName: String? = null): PersonDto {
+        val name = FullName(firstName ?: "", lastName ?: "")
         val person = factory.create(name)
         repository.save(person)
         return PersonDto.createFrom(person)

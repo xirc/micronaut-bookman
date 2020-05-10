@@ -4,7 +4,6 @@ import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.Controller
 import micronaut.bookman.controller.PersonErrorResponseSyntax.toResponseBody
 import micronaut.bookman.controller.UnitResponse
-import micronaut.bookman.domain.person.FullName
 import micronaut.bookman.domain.person.error.NoPersonException
 import micronaut.bookman.usecase.LibrarianPersonUseCase
 
@@ -14,9 +13,7 @@ class PersonsController(
 ) : PersonsApi {
 
     override fun create(request: CreatePersonRequest): HttpResponse<PersonResponse> {
-        val person = useCase.createPerson(
-                FullName(request.firstName, request.lastName)
-        )
+        val person = useCase.createPerson(request.firstName, request.lastName)
         val body = PersonResponse.success(person)
         return HttpResponse.ok(body)
     }

@@ -92,7 +92,7 @@ class LibrarianBookUseCaseTest(
 
     "Librarian can update author of a book" {
         val book = useCase.createBook("book title")
-        val person = personUseCase.createPerson(FullName("Harry", "Potter"))
+        val person = personUseCase.createPerson("Harry", "Potter")
         val newBook = useCase.patchBook(book.id, authorId = person.id)
         newBook.author shouldNotBe null
         newBook.author?.id shouldBe person.id
@@ -108,7 +108,7 @@ class LibrarianBookUseCaseTest(
 
     "Librarian can update nothing" {
         val book = useCase.createBook("a book")
-        val person = personUseCase.createPerson(FullName("abc", "def"))
+        val person = personUseCase.createPerson("first", "last")
         useCase.patchBook(book.id, null, person.id)
     }
 

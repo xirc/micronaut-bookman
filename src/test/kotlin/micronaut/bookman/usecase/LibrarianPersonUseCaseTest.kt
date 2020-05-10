@@ -26,28 +26,33 @@ class LibrarianPersonUseCaseTest(
     fun createFixtures(n: Int): List<PersonDto> {
         val fixtures = mutableListOf<PersonDto>()
         for (i in 0 until n) {
-            val person = useCase.createPerson(FullName("first$i", "last$i"))
+            val person = useCase.createPerson("first$i", "last$i")
             fixtures.add(person)
         }
         return fixtures
     }
 
     "Librarian can create a person" {
-        val name = FullName("Harry", "Potter")
-        val person = useCase.createPerson(name)
-        person.firstName shouldBe name.firstName
-        person.lastName shouldBe name.lastName
+        val person = useCase.createPerson("Harry", "Potter")
+        person.firstName shouldBe "Harry"
+        person.lastName shouldBe "Potter"
+    }
+
+    "Librarian can create a person with empty name" {
+        val person = useCase.createPerson()
+        person.firstName shouldBe ""
+        person.lastName shouldBe ""
     }
 
     "Librarian should create persons that have different IDs" {
         val name = FullName("Harry", "Potter")
-        val person1 = useCase.createPerson(name)
-        val person2 = useCase.createPerson(name)
+        val person1 = useCase.createPerson(name.firstName, name.lastName)
+        val person2 = useCase.createPerson(name.firstName, name.lastName)
         person1.id shouldNotBe person2.id
     }
 
     "Librarian can get a person" {
-        val person = useCase.createPerson(FullName("Harry", "Potter"))
+        val person = useCase.createPerson("Harry", "Potter")
         val referencePerson = useCase.getPerson(person.id)
         referencePerson.id shouldBe person.id
         referencePerson.firstName shouldBe person.firstName
@@ -62,7 +67,7 @@ class LibrarianPersonUseCaseTest(
     }
 
     "Librarian can delete a person" {
-        val person = useCase.createPerson(FullName("Harry", "Potter"))
+        val person = useCase.createPerson("Harry", "Potter")
         useCase.deletePerson(person.id)
     }
 
@@ -75,7 +80,7 @@ class LibrarianPersonUseCaseTest(
 
     "Librarian can update first name of a person" {
         val name = FullName("Harry", "Potter")
-        val person = useCase.createPerson(name)
+        val person = useCase.createPerson(name.firstName, name.lastName)
         val newFirstName = "first"
         val newPerson = useCase.patchPerson(person.id, newFirstName, null)
         newPerson.id shouldBe person.id
@@ -85,7 +90,7 @@ class LibrarianPersonUseCaseTest(
 
     "Librarian can update last name of a person" {
         val name = FullName("Harry", "Potter")
-        val person = useCase.createPerson(name)
+        val person = useCase.createPerson(name.firstName, name.lastName)
         val newLastName = "last"
         val newPerson = useCase.patchPerson(person.id, null, newLastName)
         newPerson.id shouldBe person.id
