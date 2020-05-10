@@ -20,23 +20,10 @@ import javax.sql.DataSource
 @MicronautTest
 class DBPersonRepositoryTest(
         private val source: DataSource,
-        private val factory: Person.Factory
+        private val factory: Person.Factory,
+        private val personFixture: DBPersonFixture
 ) : SpecWithDataSource(source, {
     val repository = DBPersonRepository(source, factory)
-
-    fun createFixture(): Person {
-        val person = factory.create(FullName("Harry", "Potter"))
-        repository.save(person)
-        return person
-    }
-    fun createPersonFixtures(n: Int): List<Person> {
-        // TODO Batch Insert する
-        // TODO dont use map with save operation
-        return (0 until n).map {
-            val person = factory.create(FullName("First$it", "Last$it"))
-            repository.save(person)
-        }
-    }
 
     "DBPersonRepository can create a person" {
         val person = factory.create(FullName("Harry", "Potter"))
@@ -54,7 +41,7 @@ class DBPersonRepositoryTest(
     }
 
     "DBPersonRepository can get a person" {
-        val person = createFixture()
+        val person = personFixture.create()
         val referencePerson = repository.get(person.id)
         referencePerson.run {
             id shouldBe person.id
@@ -72,7 +59,7 @@ class DBPersonRepositoryTest(
     }
 
     "DBPersonRepository can update a person" {
-        val person = createFixture()
+        val person = personFixture.create()
         person.updateFirstName("Ronald")
         person.updateLastName("Weasley")
         repository.update(person)
@@ -93,7 +80,7 @@ class DBPersonRepositoryTest(
     }
 
     "DBPersonRepository can delete a person" {
-        val person = createFixture()
+        val person = personFixture.create()
         shouldNotThrowAny {
             repository.delete(person.id)
         }
@@ -113,7 +100,7 @@ class DBPersonRepositoryTest(
     }
 
     "DBPersonRepository can get a page" {
-        createPersonFixtures(PersonRepository.PageSize + 1)
+        personFixture.createCollection(PersonRepository.PageSize + 1)
         val personsInPage0 = repository.getPage(0)
         personsInPage0.size shouldBe PersonRepository.PageSize
         personsInPage0 shouldBeSortedWith compareByDescending { it.updatedDate }
@@ -134,7 +121,7 @@ class DBPersonRepositoryTest(
 
     "DBPersonRepository can get page count" {
         // The repository has (MaxPageCount + 2) pages.
-        createPersonFixtures(PersonRepository.PageSize * (PersonRepository.MaxPageCount + 1) + 1)
+        personFixture.createCollection(PersonRepository.PageSize * (PersonRepository.MaxPageCount + 1) + 1)
         repository.countPage(0) shouldBe PersonRepository.MaxPageCount
         repository.countPage(1) shouldBe PersonRepository.MaxPageCount
         repository.countPage(2) shouldBe PersonRepository.MaxPageCount - 1
@@ -149,7 +136,7 @@ class DBPersonRepositoryTest(
     }
 
     "DBPersonRepository can get persons that have specified ID" {
-        val origPersons = createPersonFixtures(10)
+        val origPersons = personFixture.createCollection(10)
         val targetIds = origPersons.subList(3, 7).map { it.id }
         val persons = repository.getAll(targetIds)
         persons.size shouldBe targetIds.size
@@ -159,7 +146,7 @@ class DBPersonRepositoryTest(
     }
 
     "DBPersonRepository can get persons with ID set which contains invalid ID" {
-        val origPersons = createPersonFixtures(10)
+        val origPersons = personFixture.createCollection(10)
         val targetIds = origPersons.subList(2, 8).map { it.id }
         val persons = repository.getAll(targetIds.plus(UUID.randomUUID().toString()))
         persons.size shouldBe targetIds.size

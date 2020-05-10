@@ -9,10 +9,8 @@ import micronaut.bookman.domain.book.Book
 import micronaut.bookman.domain.book.BookRepository
 import micronaut.bookman.domain.book.error.NoBookException
 import micronaut.bookman.domain.person.FullName
-import micronaut.bookman.domain.person.Person
 import micronaut.bookman.domain.person.PersonRepository
 import micronaut.bookman.domain.person.error.NoPersonException
-import micronaut.bookman.domain.time.ServerDateTimeFactory
 import java.util.*
 import javax.sql.DataSource
 
@@ -20,17 +18,13 @@ import javax.sql.DataSource
 class LibrarianBookUseCaseTest(
         private val source: DataSource,
         private val factory: Book.Factory,
-        private val personFactory: Person.Factory,
         private val repository: BookRepository,
-        private val personRepository: PersonRepository
+        private val personRepository: PersonRepository,
+        private val personUseCase: LibrarianPersonUseCase
 ) : SpecWithDataSource(source, {
     val useCase = LibrarianBookUseCase(
             factory,
             repository,
-            personRepository
-    )
-    val personUseCase = LibrarianPersonUseCase(
-            Person.Factory(ServerDateTimeFactory()),
             personRepository
     )
 

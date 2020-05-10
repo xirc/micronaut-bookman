@@ -11,11 +11,8 @@ import micronaut.bookman.domain.book.BookAuthor
 import micronaut.bookman.domain.book.BookRepository
 import micronaut.bookman.domain.book.error.DuplicateBookException
 import micronaut.bookman.domain.book.error.NoBookException
-import micronaut.bookman.domain.person.FullName
-import micronaut.bookman.domain.person.Person
 import micronaut.bookman.domain.person.error.NoPersonException
 import micronaut.bookman.infra.book.DBBookRepository
-import micronaut.bookman.infra.person.DBPersonRepository
 import java.lang.IllegalArgumentException
 import java.util.*
 import javax.sql.DataSource
@@ -24,35 +21,10 @@ import javax.sql.DataSource
 class DBBookRepositoryTest(
         private val source: DataSource,
         private val factory: Book.Factory,
-        private val personFactory: Person.Factory
+        private val bookFixture: DBBookFixture,
+        private val personFixture: DBPersonFixture
 ) : SpecWithDataSource(source, {
     val repository = DBBookRepository(source, factory)
-    val personRepository = DBPersonRepository(source, personFactory)
-
-    fun createFixture(): Book {
-        val book = factory.create()
-        repository.save(book)
-        return book
-    }
-    fun createFixtures(n: Int): List<Book> {
-        var books = mutableListOf<Book>()
-        for (i in 0 until n) {
-            val book = factory.create()
-            book.updateTitle("book $i")
-            val savedBook = repository.save(book)
-            books.add(savedBook)
-        }
-        return books
-    }
-    fun createPersonFixtures(n: Int): List<Person> {
-        var persons = mutableListOf<Person>()
-        for (i in 0 until n ) {
-            val person = personFactory.create(FullName("First$i", "Last$i"))
-            val savedPerson = personRepository.save(person)
-            persons.add(savedPerson)
-        }
-        return persons
-    }
 
     "DBBookRepository can create a book" {
         val book = factory.create()
@@ -70,7 +42,7 @@ class DBBookRepositoryTest(
     }
 
     "DBBookRepository can get a book" {
-        val book = createFixture()
+        val book = bookFixture.create()
         val referenceBook = repository.get(book.id)
         referenceBook.run {
             id shouldBe book.id
@@ -88,7 +60,7 @@ class DBBookRepositoryTest(
     }
 
     "DBBookRepository can delete a book" {
-        val book = createFixture()
+        val book = bookFixture.create()
         repository.delete(book.id)
         shouldThrow<NoBookException> {
             repository.get(book.id)
@@ -106,10 +78,8 @@ class DBBookRepositoryTest(
     }
 
     "DBBookRepository can update a book" {
-        val book = factory.create()
-        repository.save(book)
-        val person = personFactory.create(FullName("Harry", "Potter"))
-        personRepository.save(person)
+        val book = bookFixture.create()
+        val person = personFixture.create()
         val newTitle = "a new title"
 
         book.updateTitle(newTitle)
@@ -137,7 +107,7 @@ class DBBookRepositoryTest(
     }
 
     "DBBookRepository can get a page" {
-        createFixtures(BookRepository.PageSize + 1)
+        bookFixture.createCollection(BookRepository.PageSize + 1)
 
         val personsInPage0 = repository.getPage(0)
         personsInPage0.size shouldBe BookRepository.PageSize
@@ -149,8 +119,8 @@ class DBBookRepositoryTest(
     }
 
     "DBBookRepository can get a page that contains a book which have a author." {
-        val origBooks = createFixtures(5)
-        val persons = createPersonFixtures(3)
+        val origBooks = bookFixture.createCollection(5)
+        val persons = personFixture.createCollection(3)
         origBooks[0].updateAuthor(BookAuthor(persons[0].id))
         origBooks[2].updateAuthor(BookAuthor(persons[1].id))
         origBooks[3].updateAuthor(BookAuthor(persons[1].id))
@@ -180,7 +150,7 @@ class DBBookRepositoryTest(
 
     "DBBookRepository can get page count" {
         // The repository has (MaxPageCount + 2) pages.
-        createFixtures(BookRepository.PageSize * (BookRepository.MaxPageCount + 1) + 1)
+        bookFixture.createCollection(BookRepository.PageSize * (BookRepository.MaxPageCount + 1) + 1)
         repository.countPage(0) shouldBe BookRepository.MaxPageCount
         repository.countPage(1) shouldBe BookRepository.MaxPageCount
         repository.countPage(2) shouldBe BookRepository.MaxPageCount - 1

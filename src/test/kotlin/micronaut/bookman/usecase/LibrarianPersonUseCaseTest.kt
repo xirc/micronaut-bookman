@@ -22,6 +22,7 @@ class LibrarianPersonUseCaseTest(
             factory,
             repository
     )
+
     fun createFixtures(n: Int): List<PersonDto> {
         val fixtures = mutableListOf<PersonDto>()
         for (i in 0 until n) {

@@ -3,38 +3,19 @@ package micronaut.bookman.controller
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldNotBe
 import io.kotlintest.specs.StringSpec
-import io.micronaut.context.ApplicationContext
 import io.micronaut.http.HttpStatus
-import io.micronaut.runtime.server.EmbeddedServer
 import io.micronaut.test.annotation.MicronautTest
 import micronaut.bookman.controller.person.CreatePersonRequest
 import micronaut.bookman.controller.person.PatchPersonRequest
 import micronaut.bookman.controller.person.PersonsClient
 import micronaut.bookman.domain.person.PersonRepository
-import micronaut.bookman.usecase.PersonDto
 import java.util.*
 
 @MicronautTest
-class PersonsControllerTest(ctx: ApplicationContext): StringSpec({
-    val embeddedServer: EmbeddedServer = ctx.getBean(EmbeddedServer::class.java)
-    val client = embeddedServer.applicationContext.getBean(PersonsClient::class.java)
-
-    fun createFixture(): PersonDto {
-        val firstName = "first ${UUID.randomUUID()}"
-        val lastName = "last ${UUID.randomUUID()}"
-        val response = client.create(CreatePersonRequest(firstName, lastName))
-        return response.body()?.value!!
-    }
-    fun createFixtures(n: Int): List<PersonDto> {
-        val fixtures = mutableListOf<PersonDto>()
-        for (i in 0 until n) {
-            val firstName = "first$i"
-            val lastName = "last$i"
-            val response = client.create(CreatePersonRequest(firstName, lastName))
-            fixtures.add(response.body()?.value!!)
-        }
-        return fixtures
-    }
+class PersonsControllerTest(
+    private val client: PersonsClient,
+    private val personFixture: PersonFixtureClient
+): StringSpec({
 
     "PersonController can create a person" {
         val firstName = "first ${UUID.randomUUID()}"
@@ -58,7 +39,7 @@ class PersonsControllerTest(ctx: ApplicationContext): StringSpec({
     }
 
     "PersonController can get a person with ID" {
-        val person = createFixture()
+        val person = personFixture.create()
         val response = client.get(person.id)
         response.status shouldBe HttpStatus.OK
         response.body()!!.run {
@@ -82,7 +63,7 @@ class PersonsControllerTest(ctx: ApplicationContext): StringSpec({
     }
 
     "PersonController can delete a person" {
-        val person = createFixture()
+        val person = personFixture.create()
         val response = client.delete(person.id)
         response.status shouldBe HttpStatus.OK
         response.body()!!.run {
@@ -101,7 +82,7 @@ class PersonsControllerTest(ctx: ApplicationContext): StringSpec({
     }
 
     "PersonController can update name of a person" {
-        val person = createFixture()
+        val person = personFixture.create()
         val newFirstName = "firstName"
         val newLastName = "lastName"
         val response = client.patch(person.id, PatchPersonRequest(newFirstName, newLastName))
@@ -128,7 +109,7 @@ class PersonsControllerTest(ctx: ApplicationContext): StringSpec({
 
     "PersonController can list persons" {
         // 3 pages
-        createFixtures(PersonRepository.PageSize * 3 + 1)
+        personFixture.createCollection(PersonRepository.PageSize * 3 + 1)
         val response = client.list(1)
         response.status shouldBe HttpStatus.OK
         response.body()!!.run {
