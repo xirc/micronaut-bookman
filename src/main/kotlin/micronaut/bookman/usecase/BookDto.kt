@@ -9,15 +9,16 @@ data class BookDto private constructor(
         val id: String,
         @JsonInclude(JsonInclude.Include.NON_NULL)
         val title: String,
-        val author: PersonDto?,
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        val authors: List<PersonDto>,
         val createdDate: DateTime,
         val updatedDate: DateTime
 ) {
     companion object {
-        fun createFrom(book: Book, author: Person?) = BookDto(
+        fun createFrom(book: Book, authors: List<Person>) = BookDto(
                 book.id,
                 book.title,
-                author?.let { PersonDto.createFrom(it) },
+                authors.map { PersonDto.createFrom(it) },
                 book.createdDate,
                 book.updatedDate
         )

@@ -1,5 +1,7 @@
 package micronaut.bookman.controller
 
+import io.kotlintest.matchers.collections.shouldBeOneOf
+import io.kotlintest.matchers.collections.shouldContain
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldNotBe
 import io.micronaut.http.HttpStatus
@@ -121,8 +123,9 @@ class BooksControllerTest(
             error shouldBe null
             value shouldNotBe null
             value?.id shouldBe book.id
-            value?.author shouldNotBe null
-            value?.author?.id shouldBe person.id
+            val authors = value!!.authors
+            authors.size shouldBe 1
+            authors.map { it.id } shouldContain  person.id
         }
     }
 

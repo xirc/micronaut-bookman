@@ -1,6 +1,8 @@
 package micronaut.bookman.infra
 
+import io.kotlintest.matchers.collections.shouldBeOneOf
 import io.kotlintest.matchers.collections.shouldBeSortedWith
+import io.kotlintest.matchers.collections.shouldContain
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldNotThrowAny
 import io.kotlintest.shouldThrow
@@ -81,14 +83,28 @@ class DBBookRepositoryTest(
         val book = bookFixture.create()
         val person = personFixture.create()
         val newTitle = "a new title"
+        val authors = listOf(BookAuthor(person.id))
 
         book.updateTitle(newTitle)
-        book.updateAuthor(BookAuthor(person.id))
+        book.updateAuthors(authors)
         repository.update(book)
 
         val newBook = repository.get(book.id)
         newBook.title shouldBe newTitle
-        newBook.author?.personId shouldBe person.id
+        newBook.authors.size shouldBe 1
+        newBook.authors.map { it.personId } shouldContain person.id
+    }
+
+    "DBBookRepository can delete a author of book" {
+        val book = bookFixture.create()
+        val person = personFixture.create()
+        book.updateAuthors(listOf(BookAuthor(person.id)))
+
+        val bookWithAuthor = repository.update(book)
+        bookWithAuthor.updateAuthors(emptyList())
+
+        val bookWithoutAuthor = repository.update(bookWithAuthor)
+        bookWithoutAuthor.authors.size shouldBe 0
     }
 
     "DBBookRepository cannot update a book with invalid ID" {
@@ -101,7 +117,8 @@ class DBBookRepositoryTest(
 
         shouldThrow<NoPersonException> {
             val personId = UUID.randomUUID().toString()
-            book.updateAuthor(BookAuthor(personId))
+            val authors = listOf(BookAuthor(personId))
+            book.updateAuthors(authors)
             repository.update(book)
         }
     }
@@ -121,10 +138,10 @@ class DBBookRepositoryTest(
     "DBBookRepository can get a page that contains a book which have a author." {
         val origBooks = bookFixture.createCollection(5)
         val persons = personFixture.createCollection(3)
-        origBooks[0].updateAuthor(BookAuthor(persons[0].id))
-        origBooks[2].updateAuthor(BookAuthor(persons[1].id))
-        origBooks[3].updateAuthor(BookAuthor(persons[1].id))
-        origBooks[4].updateAuthor(BookAuthor(persons[2].id))
+        origBooks[0].updateAuthors(listOf(BookAuthor(persons[0].id)))
+        origBooks[2].updateAuthors(listOf(BookAuthor(persons[1].id)))
+        origBooks[3].updateAuthors(listOf(BookAuthor(persons[1].id)))
+        origBooks[4].updateAuthors(listOf(BookAuthor(persons[2].id)))
         for (book in origBooks) {
             repository.update(book)
         }
@@ -134,7 +151,15 @@ class DBBookRepositoryTest(
         books.size shouldBe 5
         books shouldBeSortedWith compareByDescending { it.updatedDate }
         for (book in books) {
-            book.author?.personId shouldBe origBookById[book.id]?.author?.personId
+            val origBook = origBookById[book.id]
+            if (origBook == null) {
+                book.authors.size shouldBe 0
+            } else {
+                val personIds = origBook.authors.map { it.personId }
+                for (author in book.authors) {
+                    author.personId shouldBeOneOf personIds
+                }
+            }
         }
     }
 

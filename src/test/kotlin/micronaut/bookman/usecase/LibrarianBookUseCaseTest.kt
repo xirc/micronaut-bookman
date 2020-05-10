@@ -1,5 +1,6 @@
 package micronaut.bookman.usecase
 
+import io.kotlintest.matchers.collections.shouldContain
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldNotBe
 import io.kotlintest.shouldThrow
@@ -98,8 +99,8 @@ class LibrarianBookUseCaseTest(
         val book = useCase.createBook("book title")
         val person = personUseCase.createPerson("Harry", "Potter")
         val newBook = useCase.patchBook(book.id, authorId = person.id)
-        newBook.author shouldNotBe null
-        newBook.author?.id shouldBe person.id
+        newBook.authors.size shouldBe 1
+        newBook.authors.map { it.id } shouldContain person.id
     }
 
     "Librarian cannot update author of a book to invalid one." {

@@ -15,15 +15,15 @@ class LibrarianBookUseCase(
 ) {
     fun getBook(id: String): BookDto {
         val book = repository.get(id)
-        val author = book.author?.let { personRepository.get(it.personId) }
-        return BookDto.createFrom(book, author)
+        val authors = personRepository.getAll(book.authors.map { it.personId })
+        return BookDto.createFrom(book, authors)
     }
 
     fun createBook(title: String? = null): BookDto {
         val book = factory.create()
         book.updateTitle(title ?: "")
         val savedBook = repository.save(book)
-        return BookDto.createFrom(savedBook, null)
+        return BookDto.createFrom(savedBook, emptyList())
     }
 
     fun deleteBook(id: String) {
@@ -40,11 +40,11 @@ class LibrarianBookUseCase(
             book.updateTitle(title)
         }
         authorId?.let {
-            book.updateAuthor(BookAuthor(authorId))
+            book.updateAuthors(listOf(BookAuthor(authorId))) // TODO
         }
         val updatedBook = repository.update(book)
-        val author = book.author?.let { personRepository.get(it.personId) }
-        return BookDto.createFrom(updatedBook, author)
+        val authors = personRepository.getAll(book.authors.map { it.personId })
+        return BookDto.createFrom(updatedBook, authors)
     }
 
     fun listBook(
@@ -53,11 +53,11 @@ class LibrarianBookUseCase(
         if (page < 0) throw IllegalArgumentException("page should be positive or zero.")
         val books = repository.getPage(page.toLong())
         val pageCount = repository.countPage(page.toLong())
-        val persons = personRepository.getAll(books.mapNotNull { it.author?.personId })
-        val personById = persons.associateBy { it.id }
+        val persons = personRepository.getAll(books.flatMap { it.authors.map { author -> author.personId } })
+        var personById = persons.associateBy { it.id }
         val bookDtoList = books.map {
-            val author = it.author?.personId?.let { id -> personById[id] }
-            BookDto.createFrom(it, author)
+            val authors = it.authors.mapNotNull { author -> personById[author.personId] }
+            BookDto.createFrom(it, authors)
         }
         return BookCollectionDto(bookDtoList, pageCount)
     }
