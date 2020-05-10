@@ -22,6 +22,14 @@ class LibrarianPersonUseCaseTest(
             factory,
             repository
     )
+    fun createFixtures(n: Int): List<PersonDto> {
+        val fixtures = mutableListOf<PersonDto>()
+        for (i in 0 until n) {
+            val person = useCase.createPerson(FullName("first$i", "last$i"))
+            fixtures.add(person)
+        }
+        return fixtures
+    }
 
     "Librarian can create a person" {
         val name = FullName("Harry", "Potter")
@@ -95,6 +103,14 @@ class LibrarianPersonUseCaseTest(
         shouldThrow<NoPersonException> {
             useCase.patchPerson(id, null, "last")
         }
+    }
+
+    "Librarian can list persons" {
+        // 3 pages
+        createFixtures(PersonRepository.PageSize * 2 + 1)
+        val personsInPage1 = useCase.listPerson(1)
+        personsInPage1.persons.size shouldBe PersonRepository.PageSize
+        personsInPage1.pageCount shouldBe 1
     }
 
 })

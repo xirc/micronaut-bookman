@@ -25,3 +25,6 @@ Content-Type: {{type}}
     "firstName": "Ronald",
     "lastName": "Weasley"
 }
+
+###
+GET {{url}}/persons?page=0

@@ -36,4 +36,16 @@ class LibrarianPersonUseCase(
         repository.update(person)
         return PersonDto.createFrom(person)
     }
+
+    fun listPerson(
+            page: Long
+    ): PersonCollectionDto {
+        if (page < 0) throw IllegalArgumentException("page should be positive or zero.")
+        val persons = repository.getPage(page)
+        val pageCount = repository.countPage(page)
+        return PersonCollectionDto(
+                persons.map { PersonDto.createFrom(it) },
+                pageCount
+        )
+    }
 }
