@@ -24,3 +24,6 @@ Content-Type: {{type}}
     "title": "a new book title",
     "authorId": null
 }
+
+###
+GET {{url}}/books?page=0

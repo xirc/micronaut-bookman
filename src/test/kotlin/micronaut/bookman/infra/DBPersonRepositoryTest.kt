@@ -1,5 +1,6 @@
 package micronaut.bookman.infra
 
+import io.kotlintest.matchers.collections.shouldBeOneOf
 import io.kotlintest.matchers.collections.shouldBeSortedWith
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldNotThrowAny
@@ -30,6 +31,7 @@ class DBPersonRepositoryTest(
     }
     fun createPersonFixtures(n: Int): List<Person> {
         // TODO Batch Insert する
+        // TODO dont use map with save operation
         return (0 until n).map {
             val person = factory.create(FullName("First$it", "Last$it"))
             repository.save(person)
@@ -139,6 +141,31 @@ class DBPersonRepositoryTest(
         repository.countPage(3) shouldBe PersonRepository.MaxPageCount - 2
         repository.countPage(PersonRepository.MaxPageCount.toLong()) shouldBe 1
         repository.countPage(PersonRepository.MaxPageCount + 1L) shouldBe 0
+    }
+
+    "DBPersonRepository can get no persons with empty ID set" {
+        val empty = repository.getAll(emptyList())
+        empty.size shouldBe 0
+    }
+
+    "DBPersonRepository can get persons that have specified ID" {
+        val origPersons = createPersonFixtures(10)
+        val targetIds = origPersons.subList(3, 7).map { it.id }
+        val persons = repository.getAll(targetIds)
+        persons.size shouldBe targetIds.size
+        for (person in persons) {
+            person.id shouldBeOneOf targetIds
+        }
+    }
+
+    "DBPersonRepository can get persons with ID set which contains invalid ID" {
+        val origPersons = createPersonFixtures(10)
+        val targetIds = origPersons.subList(2, 8).map { it.id }
+        val persons = repository.getAll(targetIds.plus(UUID.randomUUID().toString()))
+        persons.size shouldBe targetIds.size
+        for (person in persons) {
+            person.id shouldBeOneOf targetIds
+        }
     }
 
 })

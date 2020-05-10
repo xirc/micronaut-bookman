@@ -56,4 +56,10 @@ class BooksController(
         }
     }
 
+    override fun list(page: Int?): HttpResponse<BookCollectionResponse> {
+        val books = useCase.listBook(page ?: 0)
+        val body = BookCollectionResponse.success(books)
+        return HttpResponse.ok(body)
+    }
+
 }

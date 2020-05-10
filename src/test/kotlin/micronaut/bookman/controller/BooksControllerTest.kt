@@ -12,6 +12,7 @@ import micronaut.bookman.controller.book.CreateBookRequest
 import micronaut.bookman.controller.book.PatchBookRequest
 import micronaut.bookman.controller.person.CreatePersonRequest
 import micronaut.bookman.controller.person.PersonsClient
+import micronaut.bookman.domain.book.BookRepository
 import micronaut.bookman.usecase.BookDto
 import micronaut.bookman.usecase.PersonDto
 import java.util.*
@@ -22,6 +23,7 @@ class BooksControllerTest(ctx: ApplicationContext): StringSpec({
     val client = embeddedServer.applicationContext.getBean(BooksClient::class.java)
     val personClient = embeddedServer.applicationContext.getBean(PersonsClient::class.java)
 
+    // TODO リファクタしたほうがよい
     fun createFixture(): BookDto {
         val title = "title ${UUID.randomUUID()}"
         val response = client.create(CreateBookRequest(title))
@@ -32,6 +34,14 @@ class BooksControllerTest(ctx: ApplicationContext): StringSpec({
         val lastName = "last"
         val response = personClient.create(CreatePersonRequest(firstName, lastName))
         return response.body()?.value!!
+    }
+    fun createFixtures(n: Int): List<BookDto> {
+        val fixtures = mutableListOf<BookDto>()
+        for (i in 0 until n) {
+            val response = client.create(CreateBookRequest("title$i"))
+            fixtures.add(response.body()?.value!!)
+        }
+        return fixtures
     }
 
     "BookController can create a book" {
@@ -130,6 +140,21 @@ class BooksControllerTest(ctx: ApplicationContext): StringSpec({
             value?.id shouldBe book.id
             value?.author shouldNotBe null
             value?.author?.id shouldBe person.id
+        }
+    }
+
+    // TODO BookController に 無効な著者を設定しようとしたときのテストがない
+
+    "BookController can list books" {
+        // 3 pages
+        createFixtures(BookRepository.PageSize * 3 + 1)
+        val response = client.list(1)
+        response.status shouldBe HttpStatus.OK
+        response.body()!!.run {
+            error shouldBe null
+            value shouldNotBe null
+            value?.pageCount shouldBe 2
+            value?.books?.size shouldBe BookRepository.PageSize
         }
     }
 

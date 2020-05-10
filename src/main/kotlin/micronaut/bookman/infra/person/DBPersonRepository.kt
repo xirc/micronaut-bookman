@@ -120,4 +120,13 @@ class DBPersonRepository(
             ).count() / PersonRepository.PageSize
         }
     }
+
+    override fun getAll(ids: List<String>): List<Person> {
+        if (ids.isEmpty()) return emptyList()
+        return transaction(Database.connect(source)) {
+            PersonTable.selectAll().orWhere { PersonTable.id inList ids }.map {
+                createPerson(it)
+            }
+        }
+    }
 }
