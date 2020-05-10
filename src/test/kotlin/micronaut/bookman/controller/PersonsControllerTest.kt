@@ -18,6 +18,15 @@ class PersonsControllerTest(
 ): StringSpec({
 
     "PersonController can create a person" {
+        val response = client.create(CreatePersonRequest())
+        response.status shouldBe HttpStatus.OK
+        response.body()!!.run {
+            error shouldBe null
+            value shouldNotBe null
+        }
+    }
+
+    "PersonController can create a person with name" {
         val firstName = "first ${UUID.randomUUID()}"
         val lastName = "last ${UUID.randomUUID()}"
         val response = client.create(CreatePersonRequest(firstName, lastName))
