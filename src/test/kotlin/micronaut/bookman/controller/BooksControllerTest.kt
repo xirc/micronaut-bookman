@@ -117,7 +117,7 @@ class BooksControllerTest(
     "BookController can update author of a book" {
         val book = bookFixture.create()
         val person = personFixture.create()
-        val response = client.patch(book.id, PatchBookRequest(null, person.id))
+        val response = client.patch(book.id, PatchBookRequest(null, listOf(person.id)))
         response.status shouldBe HttpStatus.OK
         response.body()!!.run {
             error shouldBe null
@@ -132,7 +132,7 @@ class BooksControllerTest(
     "BookController cannot update author of a book to invalid one" {
         val book = bookFixture.create()
         val personId = UUID.randomUUID().toString()
-        val response = client.patch(book.id, PatchBookRequest(null, personId))
+        val response = client.patch(book.id, PatchBookRequest(null, listOf(personId)))
         response.status shouldBe HttpStatus.OK
         response.body()!!.run {
             value shouldBe null

@@ -97,24 +97,30 @@ class LibrarianBookUseCaseTest(
 
     "Librarian can update author of a book" {
         val book = useCase.createBook("book title")
-        val person = personUseCase.createPerson("Harry", "Potter")
-        val newBook = useCase.patchBook(book.id, authorId = person.id)
-        newBook.authors.size shouldBe 1
-        newBook.authors.map { it.id } shouldContain person.id
+        val person1 = personUseCase.createPerson("Harry", "Potter")
+        val person2 = personUseCase.createPerson("Rubeus", "Hagrid")
+        val newBook = useCase.patchBook(book.id, authorIds = listOf(person1.id, person2.id))
+        newBook.authors.size shouldBe 2
+        newBook.authors.map { it.id } shouldContain person1.id
+        newBook.authors.map { it.id } shouldContain person2.id
     }
 
     "Librarian cannot update author of a book to invalid one." {
         val book = useCase.createBook("book title")
         val personId = UUID.randomUUID().toString()
         shouldThrow<NoPersonException> {
-            useCase.patchBook(book.id, null, personId)
+            useCase.patchBook(book.id, null, listOf(personId))
         }
     }
 
     "Librarian can update nothing" {
         val book = useCase.createBook("a book")
         val person = personUseCase.createPerson("first", "last")
-        useCase.patchBook(book.id, null, person.id)
+        useCase.patchBook(book.id, authorIds = listOf(person.id))
+        val newBook = useCase.patchBook(book.id, null, null)
+        newBook.id shouldBe book.id
+        newBook.title shouldBe "a book"
+        newBook.authors.map { it.id } shouldContain person.id
     }
 
     "Librarian can list books" {

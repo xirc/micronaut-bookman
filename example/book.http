@@ -22,7 +22,7 @@ Content-Type: {{type}}
 
 {
     "title": "a new book title",
-    "authorId": null
+    "authorIds": null
 }
 
 ###

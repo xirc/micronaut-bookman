@@ -33,17 +33,17 @@ class LibrarianBookUseCase(
     fun patchBook(
             id: String,
             title: String? = null,
-            authorId: String? = null
+            authorIds: List<String>? = null
     ): BookDto {
         val book = repository.get(id)
         if (title != null) {
             book.updateTitle(title)
         }
-        authorId?.let {
-            book.updateAuthors(listOf(BookAuthor(authorId))) // TODO
+        if (authorIds != null) {
+            book.updateAuthors(authorIds.map { BookAuthor(it) })
         }
         val updatedBook = repository.update(book)
-        val authors = personRepository.getAll(book.authors.map { it.personId })
+        val authors = personRepository.getAll(updatedBook.authors.map { it.personId })
         return BookDto.createFrom(updatedBook, authors)
     }
 
