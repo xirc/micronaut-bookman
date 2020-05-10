@@ -143,7 +143,17 @@ class BooksControllerTest(ctx: ApplicationContext): StringSpec({
         }
     }
 
-    // TODO BookController に 無効な著者を設定しようとしたときのテストがない
+    "BookController cannot update author of a book to invalid one" {
+        val book = createFixture()
+        val personId = UUID.randomUUID().toString()
+        val response = client.patch(book.id, PatchBookRequest(null, personId))
+        response.status shouldBe HttpStatus.OK
+        response.body()!!.run {
+            value shouldBe null
+            error shouldNotBe null
+            error?.id shouldBe ErrorCode.PERSON_NOT_FOUND
+        }
+    }
 
     "BookController can list books" {
         // 3 pages

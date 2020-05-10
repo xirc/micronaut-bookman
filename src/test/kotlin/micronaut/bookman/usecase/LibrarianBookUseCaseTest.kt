@@ -11,6 +11,7 @@ import micronaut.bookman.domain.book.error.NoBookException
 import micronaut.bookman.domain.person.FullName
 import micronaut.bookman.domain.person.Person
 import micronaut.bookman.domain.person.PersonRepository
+import micronaut.bookman.domain.person.error.NoPersonException
 import micronaut.bookman.domain.time.ServerDateTimeFactory
 import java.util.*
 import javax.sql.DataSource
@@ -101,6 +102,14 @@ class LibrarianBookUseCaseTest(
         val newBook = useCase.patchBook(book.id, authorId = person.id)
         newBook.author shouldNotBe null
         newBook.author?.id shouldBe person.id
+    }
+
+    "Librarian cannot update author of a book to invalid one." {
+        val book = useCase.createBook("book title")
+        val personId = UUID.randomUUID().toString()
+        shouldThrow<NoPersonException> {
+            useCase.patchBook(book.id, null, personId)
+        }
     }
 
     "Librarian can update nothing" {
