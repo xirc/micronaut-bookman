@@ -38,6 +38,10 @@ class LibrarianBookUseCaseTest(
     }
 
     "Librarian can create a book" {
+        useCase.createBook()
+    }
+
+    "Librarian can create a book with title" {
         val title = "Book (${UUID.randomUUID()})"
         val book = useCase.createBook(title)
         book.title shouldBe title

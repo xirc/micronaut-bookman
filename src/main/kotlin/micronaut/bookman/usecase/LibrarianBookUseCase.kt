@@ -19,9 +19,9 @@ class LibrarianBookUseCase(
         return BookDto.createFrom(book, author)
     }
 
-    fun createBook(title: String): BookDto {
+    fun createBook(title: String? = null): BookDto {
         val book = factory.create()
-        book.updateTitle(title)
+        book.updateTitle(title ?: "")
         val savedBook = repository.save(book)
         return BookDto.createFrom(savedBook, null)
     }

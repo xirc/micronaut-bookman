@@ -19,6 +19,15 @@ class BooksControllerTest(
 ): StringSpec({
 
     "BookController can create a book" {
+        val response = client.create(CreateBookRequest())
+        response.status shouldBe HttpStatus.OK
+        response.body()!!.run {
+            error shouldBe null
+            value shouldNotBe null
+        }
+    }
+
+    "BookController can create a book with title" {
         val title = "title ${UUID.randomUUID()}"
         val response = client.create(CreateBookRequest(title))
         response.status shouldBe HttpStatus.OK
