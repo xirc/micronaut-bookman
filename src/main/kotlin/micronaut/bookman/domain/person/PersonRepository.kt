@@ -8,6 +8,7 @@ interface PersonRepository {
 
     fun getPage(page: Long): List<Person>
     fun countPage(offsetPage: Long): Long
+    fun getAll(ids: List<String>): List<Person>
 
     companion object {
         const val PageSize = 25

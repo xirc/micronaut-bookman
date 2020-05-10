@@ -33,6 +33,15 @@ class LibrarianBookUseCaseTest(
             personRepository
     )
 
+    fun createFixtures(n: Int): List<BookDto> {
+        val fixtures = mutableListOf<BookDto>()
+        for (i in 0 until n) {
+            val book = useCase.createBook("title $i")
+            fixtures.add(book)
+        }
+        return fixtures
+    }
+
     "Librarian can create a book" {
         val title = "Book (${UUID.randomUUID()})"
         val book = useCase.createBook(title)
@@ -98,6 +107,14 @@ class LibrarianBookUseCaseTest(
         val book = useCase.createBook("a book")
         val person = personUseCase.createPerson(FullName("abc", "def"))
         useCase.patchBook(book.id, null, person.id)
+    }
+
+    "Librarian can list books" {
+        // 3 pages
+        createFixtures(BookRepository.PageSize * 2 + 1)
+        val booksInPage1 = useCase.listBook(1)
+        booksInPage1.books.size shouldBe BookRepository.PageSize
+        booksInPage1.pageCount shouldBe 1
     }
 
 })
