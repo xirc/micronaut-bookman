@@ -10,6 +10,7 @@ import io.micronaut.test.annotation.MicronautTest
 import micronaut.bookman.controller.person.CreatePersonRequest
 import micronaut.bookman.controller.person.PatchPersonRequest
 import micronaut.bookman.controller.person.PersonsClient
+import micronaut.bookman.domain.person.PersonRepository
 import micronaut.bookman.usecase.PersonDto
 import java.util.*
 
@@ -23,6 +24,16 @@ class PersonsControllerTest(ctx: ApplicationContext): StringSpec({
         val lastName = "last ${UUID.randomUUID()}"
         val response = client.create(CreatePersonRequest(firstName, lastName))
         return response.body()?.value!!
+    }
+    fun createFixtures(n: Int): List<PersonDto> {
+        val fixtures = mutableListOf<PersonDto>()
+        for (i in 0 until n) {
+            val firstName = "first$i"
+            val lastName = "last$i"
+            val response = client.create(CreatePersonRequest(firstName, lastName))
+            fixtures.add(response.body()?.value!!)
+        }
+        return fixtures
     }
 
     "PersonController can create a person" {
@@ -112,6 +123,19 @@ class PersonsControllerTest(ctx: ApplicationContext): StringSpec({
             value shouldBe null
             error shouldNotBe null
             error?.id shouldBe ErrorCode.PERSON_NOT_FOUND
+        }
+    }
+
+    "PersonController can list persons" {
+        // 3 pages
+        createFixtures(PersonRepository.PageSize * 3 + 1)
+        val response = client.list(1)
+        response.status shouldBe HttpStatus.OK
+        response.body()!!.run {
+            error shouldBe null
+            value shouldNotBe null
+            value?.pageCount shouldBe 2
+            value?.persons?.size shouldBe PersonRepository.PageSize
         }
     }
 

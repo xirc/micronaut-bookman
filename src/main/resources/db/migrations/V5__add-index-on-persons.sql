@@ -1,0 +1,1 @@
+CREATE INDEX ix__persons_updated_date ON person(updated_date);

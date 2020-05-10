@@ -53,4 +53,12 @@ class PersonsController(
             HttpResponse.ok(body)
         }
     }
+
+    override fun list(
+            page: Int?
+    ): HttpResponse<PersonCollectionResponse> {
+        val persons = useCase.listPerson(page?.toLong() ?: 0L)
+        val body = PersonCollectionResponse.success(persons)
+        return HttpResponse.ok(body)
+    }
 }

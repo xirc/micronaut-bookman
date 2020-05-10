@@ -13,6 +13,7 @@ import micronaut.bookman.infra.error.InfraException
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.lang.IllegalArgumentException
 import java.sql.SQLIntegrityConstraintViolationException
 import javax.inject.Singleton
 import javax.sql.DataSource
@@ -96,6 +97,27 @@ class DBPersonRepository(
                 1 -> Unit
                 else -> throw IllegalDatabaseSchema("Table ${PersonTable.tableName} has illegal schema.")
             }
+        }
+    }
+
+    override fun getPage(page: Long): List<Person> {
+        if (page < 0) throw IllegalArgumentException("page should be positive or zero.")
+        return transaction(Database.connect(source)) {
+            PersonTable.selectAll().orderBy(PersonTable.updatedDate, SortOrder.DESC).limit(
+                    PersonRepository.PageSize, PersonRepository.PageSize * page
+            ).map {
+                createPerson(it)
+            }
+        }
+    }
+
+    override fun countPage(offsetPage: Long): Long {
+        if (offsetPage < 0) throw IllegalArgumentException("offsetPage should be positive or zero.")
+        return transaction(Database.connect(source)) {
+            PersonTable.selectAll().orderBy(PersonTable.updatedDate, SortOrder.DESC).limit(
+                    PersonRepository.PageSize * PersonRepository.MaxPageCount,
+                    PersonRepository.PageSize * offsetPage
+            ).count() / PersonRepository.PageSize
         }
     }
 }
