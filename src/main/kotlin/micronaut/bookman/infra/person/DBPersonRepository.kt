@@ -37,8 +37,8 @@ class DBPersonRepository(
     }
 
     override fun get(id: String): Person {
-        return transaction(Database.connect(source)) {
-            withUtcZone {
+        return withUtcZone {
+            transaction(Database.connect(source)) {
                 val person = PersonTable.select { PersonTable.id eq id }.singleOrNull()?.let {
                     createPerson(it)
                 }
@@ -48,8 +48,8 @@ class DBPersonRepository(
     }
 
     override fun save(person: Person): Person {
-        return transaction (Database.connect(source)) {
-            withUtcZone {
+        return withUtcZone {
+            transaction(Database.connect(source)) {
                 try {
                     PersonTable.insert {
                         it[id] = person.id
@@ -71,8 +71,8 @@ class DBPersonRepository(
     }
 
     override fun update(person: Person): Person {
-        return transaction (Database.connect(source)) {
-            withUtcZone {
+        return withUtcZone {
+            transaction(Database.connect(source)) {
                 val count = PersonTable.update({ PersonTable.id eq person.id }) {
                     it[firstName] = person.name.firstName
                     it[lastName] = person.name.lastName
@@ -102,30 +102,36 @@ class DBPersonRepository(
 
     override fun getPage(page: Long): List<Person> {
         if (page < 0) throw IllegalArgumentException("page should be positive or zero.")
-        return transaction(Database.connect(source)) {
-            PersonTable.selectAll().orderBy(PersonTable.updatedDate, SortOrder.DESC).limit(
-                    PersonRepository.PageSize, PersonRepository.PageSize * page
-            ).map {
-                createPerson(it)
+        return withUtcZone {
+            transaction(Database.connect(source)) {
+                PersonTable.selectAll().orderBy(PersonTable.updatedDate, SortOrder.DESC).limit(
+                        PersonRepository.PageSize, PersonRepository.PageSize * page
+                ).map {
+                    createPerson(it)
+                }
             }
         }
     }
 
     override fun countPage(offsetPage: Long): Long {
         if (offsetPage < 0) throw IllegalArgumentException("offsetPage should be positive or zero.")
-        return transaction(Database.connect(source)) {
-            PersonTable.selectAll().orderBy(PersonTable.updatedDate, SortOrder.DESC).limit(
-                    PersonRepository.PageSize * PersonRepository.MaxPageCount,
-                    PersonRepository.PageSize * offsetPage
-            ).count() / PersonRepository.PageSize
+        return withUtcZone {
+            transaction(Database.connect(source)) {
+                PersonTable.selectAll().orderBy(PersonTable.updatedDate, SortOrder.DESC).limit(
+                        PersonRepository.PageSize * PersonRepository.MaxPageCount,
+                        PersonRepository.PageSize * offsetPage
+                ).count() / PersonRepository.PageSize
+            }
         }
     }
 
     override fun getAll(ids: List<String>): List<Person> {
         if (ids.isEmpty()) return emptyList()
-        return transaction(Database.connect(source)) {
-            PersonTable.selectAll().orWhere { PersonTable.id inList ids }.map {
-                createPerson(it)
+        return withUtcZone {
+            transaction(Database.connect(source)) {
+                PersonTable.selectAll().orWhere { PersonTable.id inList ids }.map {
+                    createPerson(it)
+                }
             }
         }
     }
