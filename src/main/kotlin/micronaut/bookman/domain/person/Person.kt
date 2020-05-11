@@ -11,7 +11,7 @@ class Person private constructor(
         val id: String,
         val createdDate: DateTime
 ) {
-    var name: FullName = FullName("", "")
+    var name: FullName = DefaultName
         private set
     var updatedDate: DateTime = createdDate
         private set(value) {
@@ -50,5 +50,9 @@ class Person private constructor(
             this.name = name
             this.updatedDate = updatedDate
         }
+    }
+
+    companion object {
+        val DefaultName = FullName("", "")
     }
 }
