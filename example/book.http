@@ -28,3 +28,6 @@ Content-Type: {{type}}
 
 ###
 GET {{url}}/books?page=0
+
+###
+GET {{url}}/books/search?query=a&page=0
