@@ -49,15 +49,17 @@ GET /persons/search
 ```
 
 Files `example/*.http` contains example requests.  
-I uses `REST Client`
+I use `REST Client`
 <https://marketplace.visualstudio.com/items?itemName=humao.rest-client>
 
 `micronaut-openapi` generates swagger spec files.  
 But, I want to write swagger spec, and then generate code!
 
-## Note
+## Note & TODO
 
 * Set MySQL TimeZone to UTC.
 * Search implementations are awful...  
 Use other solutions such as Elasticsearch in production.
 * DB migration can be more cool imo.
+* Cache Layer is not used now.
+* Can I merge `***UseCase` classes???
