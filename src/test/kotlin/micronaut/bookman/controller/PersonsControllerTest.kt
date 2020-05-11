@@ -132,6 +132,16 @@ class PersonsControllerTest(
         }
     }
 
+    "PersonController cannot list persons with invalid page" {
+        val response = client.list(-1)
+        response.status shouldBe HttpStatus.OK
+        response.body()!!.run {
+            value shouldBe null
+            error shouldNotBe null
+            error?.id shouldBe ErrorCode.APP_ILLEGAL_ARGUMENT
+        }
+    }
+
     "PersonController can search persons" {
         // 4 pages
         personFixture.createCollection(PersonRepository.PageSize * 3 + 1)
@@ -142,6 +152,26 @@ class PersonsControllerTest(
             value shouldNotBe null
             value?.pageCount shouldBe 2
             value?.results?.size shouldBe PersonRepository.PageSize
+        }
+    }
+
+    "PersonController cannot search persons with invalid page" {
+        val response = client.search("abc", -1)
+        response.status shouldBe HttpStatus.OK
+        response.body()!!.run {
+            value shouldBe null
+            error shouldNotBe null
+            error?.id shouldBe ErrorCode.APP_ILLEGAL_ARGUMENT
+        }
+    }
+
+    "PersonController cannot search persons with empty query" {
+        val response = client.search("   ", 0)
+        response.status shouldBe HttpStatus.OK
+        response.body()!!.run {
+            value shouldBe null
+            error shouldNotBe null
+            error?.id shouldBe ErrorCode.APP_ILLEGAL_ARGUMENT
         }
     }
 

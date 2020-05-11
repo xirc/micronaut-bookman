@@ -11,8 +11,8 @@ import micronaut.bookman.domain.person.Person
 import micronaut.bookman.domain.person.PersonRepository
 import micronaut.bookman.domain.person.exceptions.DuplicatePersonException
 import micronaut.bookman.domain.person.exceptions.NoPersonException
+import micronaut.bookman.exceptions.AppIllegalArgumentException
 import micronaut.bookman.infra.person.DBPersonRepository
-import java.lang.IllegalArgumentException
 import java.util.*
 import javax.sql.DataSource
 
@@ -109,7 +109,7 @@ class DBPersonRepositoryTest(
     }
 
     "DBPersonRepository cannot get a page with invalid page number." {
-        shouldThrow<IllegalArgumentException> {
+        shouldThrow<AppIllegalArgumentException> {
             repository.getPage(-1)
         }
     }

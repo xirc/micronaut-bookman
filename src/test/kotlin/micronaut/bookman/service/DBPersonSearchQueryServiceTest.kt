@@ -5,10 +5,10 @@ import io.kotlintest.shouldThrow
 import io.micronaut.test.annotation.MicronautTest
 import micronaut.bookman.SpecWithDataSource
 import micronaut.bookman.domain.person.FullName
+import micronaut.bookman.exceptions.AppIllegalArgumentException
 import micronaut.bookman.infra.DBPersonFixture
 import micronaut.bookman.infra.person.DBPersonRepository
 import micronaut.bookman.query.infra.DBPersonSearchQueryService
-import java.lang.IllegalArgumentException
 import javax.sql.DataSource
 
 @MicronautTest
@@ -66,13 +66,13 @@ class DBPersonSearchQueryServiceTest(
     }
 
     "DBPersonSearchQueryService cannot search with invalid page" {
-        shouldThrow<IllegalArgumentException> {
+        shouldThrow<AppIllegalArgumentException> {
             queryService.searchAll("abc", -1)
         }
     }
 
     "DBPersonSearchQueryService cannot search with blank query" {
-        shouldThrow<IllegalArgumentException> {
+        shouldThrow<AppIllegalArgumentException> {
             queryService.searchAll("   ", 0)
         }
     }

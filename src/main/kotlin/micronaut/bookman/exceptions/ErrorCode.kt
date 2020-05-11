@@ -1,6 +1,8 @@
 package micronaut.bookman.exceptions
 
 enum class ErrorCode(value: Int) {
+    // Global 10000 ~
+    APP_ILLEGAL_ARGUMENT(10000),
     // Book 1000 ~ 1999
     BOOK_NOT_FOUND(1000),
     DUPLICATE_BOOK(1001),

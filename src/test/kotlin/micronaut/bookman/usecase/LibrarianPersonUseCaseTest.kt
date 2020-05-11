@@ -9,6 +9,7 @@ import micronaut.bookman.domain.person.FullName
 import micronaut.bookman.domain.person.Person
 import micronaut.bookman.domain.person.PersonRepository
 import micronaut.bookman.domain.person.exceptions.NoPersonException
+import micronaut.bookman.exceptions.AppIllegalArgumentException
 import java.util.*
 import javax.sql.DataSource
 
@@ -117,6 +118,12 @@ class LibrarianPersonUseCaseTest(
         val personsInPage1 = useCase.listPerson(1)
         personsInPage1.persons.size shouldBe PersonRepository.PageSize
         personsInPage1.pageCount shouldBe 1
+    }
+
+    "Librarian cannot list persons with invalid page" {
+        shouldThrow<AppIllegalArgumentException> {
+            useCase.listPerson(-1)
+        }
     }
 
 })

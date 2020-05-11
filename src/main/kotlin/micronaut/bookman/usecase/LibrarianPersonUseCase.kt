@@ -2,6 +2,7 @@ package micronaut.bookman.usecase
 
 import micronaut.bookman.domain.person.Person
 import micronaut.bookman.domain.person.PersonRepository
+import micronaut.bookman.exceptions.AppIllegalArgumentException
 import javax.inject.Singleton
 
 @Singleton
@@ -45,7 +46,7 @@ class LibrarianPersonUseCase(
     fun listPerson(
             page: Long
     ): PersonCollectionDto {
-        if (page < 0) throw IllegalArgumentException("page should be positive or zero.")
+        if (page < 0) throw AppIllegalArgumentException("page should be positive or zero.")
         val persons = repository.getPage(page)
         val pageCount = repository.countPage(page)
         return PersonCollectionDto(

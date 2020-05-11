@@ -4,7 +4,7 @@ import micronaut.bookman.domain.book.Book
 import micronaut.bookman.domain.book.BookAuthor
 import micronaut.bookman.domain.book.BookRepository
 import micronaut.bookman.domain.person.PersonRepository
-import java.lang.IllegalArgumentException
+import micronaut.bookman.exceptions.AppIllegalArgumentException
 import javax.inject.Singleton
 
 @Singleton
@@ -56,7 +56,7 @@ class LibrarianBookUseCase(
     fun listBook(
             page: Int
     ): BookCollectionDto {
-        if (page < 0) throw IllegalArgumentException("page should be positive or zero.")
+        if (page < 0) throw AppIllegalArgumentException("page should be positive or zero.")
         val books = repository.getPage(page.toLong())
         val pageCount = repository.countPage(page.toLong())
         val persons = personRepository.getAll(books.flatMap { it.authors.map { author -> author.personId } })
