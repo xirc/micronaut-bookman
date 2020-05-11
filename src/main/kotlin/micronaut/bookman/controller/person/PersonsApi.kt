@@ -19,4 +19,10 @@ interface PersonsApi {
     fun list(
             @QueryValue @PositiveOrZero page: Int?
     ): HttpResponse<PersonCollectionResponse>
+
+    @Get("/search")
+    fun search(
+            @QueryValue query: String,
+            @QueryValue @PositiveOrZero page: Int?
+    ): HttpResponse<PersonSearchResponse>
 }

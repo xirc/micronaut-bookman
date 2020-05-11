@@ -5,11 +5,14 @@ import io.micronaut.http.annotation.Controller
 import micronaut.bookman.controller.PersonErrorResponseSyntax.toResponseBody
 import micronaut.bookman.controller.UnitResponse
 import micronaut.bookman.domain.person.error.NoPersonException
+import micronaut.bookman.query.PersonSearchQueryResultSet
+import micronaut.bookman.query.PersonSearchQueryService
 import micronaut.bookman.usecase.LibrarianPersonUseCase
 
 @Controller("/persons")
 class PersonsController(
-        private val useCase: LibrarianPersonUseCase
+        private val useCase: LibrarianPersonUseCase,
+        private val queryService: PersonSearchQueryService
 ) : PersonsApi {
 
     override fun create(request: CreatePersonRequest): HttpResponse<PersonResponse> {
@@ -58,4 +61,11 @@ class PersonsController(
         val body = PersonCollectionResponse.success(persons)
         return HttpResponse.ok(body)
     }
+
+    override fun search(query: String, page: Int?): HttpResponse<PersonSearchResponse> {
+        val persons = queryService.searchAll(query, page?.toLong() ?: 0L)
+        val body = PersonSearchResponse.success(persons)
+        return HttpResponse.ok(body)
+    }
+
 }
