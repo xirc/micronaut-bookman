@@ -10,7 +10,9 @@ import micronaut.bookman.controller.book.BooksClient
 import micronaut.bookman.controller.book.CreateBookRequestBody
 import micronaut.bookman.controller.book.PatchBookRequestBody
 import micronaut.bookman.domain.book.BookRepository
+import micronaut.bookman.domain.person.PersonRepository
 import micronaut.bookman.exceptions.ErrorCode
+import micronaut.bookman.query.BookSearchQueryService
 import java.util.*
 import javax.sql.DataSource
 
@@ -153,6 +155,39 @@ class BooksControllerTest(
             value shouldNotBe null
             value?.pageCount shouldBe 2
             value?.books?.size shouldBe BookRepository.PageSize
+        }
+    }
+
+    "BookController can search books" {
+        // 4 pages
+        bookFixture.createCollection(BookSearchQueryService.PageSize * 3 + 1)
+        val response = client.search("t", 1)
+        response.status shouldBe HttpStatus.OK
+        response.body()!!.run {
+            error shouldBe null
+            value shouldNotBe null
+            value?.pageCount shouldBe 2
+            value?.results?.size shouldBe PersonRepository.PageSize
+        }
+    }
+
+    "BookController cannot search books with invalid page" {
+        val response = client.search("abc", -1)
+        response.status shouldBe HttpStatus.OK
+        response.body()!!.run {
+            value shouldBe null
+            error shouldNotBe null
+            error?.id shouldBe ErrorCode.APP_ILLEGAL_ARGUMENT
+        }
+    }
+
+    "BookController cannot search books with empty query" {
+        val response = client.search("   ", 0)
+        response.status shouldBe HttpStatus.OK
+        response.body()!!.run {
+            value shouldBe null
+            error shouldNotBe null
+            error?.id shouldBe ErrorCode.APP_ILLEGAL_ARGUMENT
         }
     }
 

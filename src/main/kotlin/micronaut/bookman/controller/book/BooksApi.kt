@@ -3,6 +3,7 @@ package micronaut.bookman.controller.book
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.*
 import micronaut.bookman.controller.ResponseBody
+import micronaut.bookman.query.BookSearchQueryResultSet
 import micronaut.bookman.usecase.BookCollectionDto
 import micronaut.bookman.usecase.BookDto
 import javax.validation.constraints.PositiveOrZero
@@ -21,4 +22,10 @@ interface BooksApi {
     fun list(
             @PositiveOrZero @QueryValue page: Int?
     ): HttpResponse<ResponseBody<BookCollectionDto>>
+
+    @Get("/search")
+    fun search(
+            @QueryValue query: String,
+            @QueryValue @PositiveOrZero page: Int?
+    ): HttpResponse<ResponseBody<BookSearchQueryResultSet>>
 }
