@@ -10,13 +10,13 @@ import javax.validation.constraints.PositiveOrZero
 
 interface PersonsApi {
     @Post("/")
-    fun create(request: CreatePersonRequest): HttpResponse<ResponseBody<PersonDto>>
+    fun create(request: CreatePersonRequestBody): HttpResponse<ResponseBody<PersonDto>>
     @Get("/{id}")
     fun get(@PathVariable id: String): HttpResponse<ResponseBody<PersonDto>>
     @Delete("/{id}")
     fun delete(@PathVariable id: String): HttpResponse<ResponseBody<Unit>>
     @Patch("/{id}")
-    fun patch(@PathVariable id: String, request: PatchPersonRequest): HttpResponse<ResponseBody<PersonDto>>
+    fun patch(@PathVariable id: String, request: PatchPersonRequestBody): HttpResponse<ResponseBody<PersonDto>>
 
     @Get("/")
     fun list(

@@ -1,6 +1,6 @@
 package micronaut.bookman.controller.person
 
-data class CreatePersonRequest(
+data class CreatePersonRequestBody(
         val firstName: String? = null,
         val lastName: String? = null
 )

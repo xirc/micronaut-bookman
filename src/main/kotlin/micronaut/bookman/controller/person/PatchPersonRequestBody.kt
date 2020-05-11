@@ -1,6 +1,6 @@
 package micronaut.bookman.controller.person
 
-data class PatchPersonRequest(
+data class PatchPersonRequestBody(
         val firstName: String?,
         val lastName: String?
 )

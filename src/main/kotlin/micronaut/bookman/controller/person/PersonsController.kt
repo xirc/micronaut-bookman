@@ -15,7 +15,7 @@ class PersonsController(
         private val queryService: PersonSearchQueryService
 ) : PersonsApi {
 
-    override fun create(request: CreatePersonRequest): HttpResponse<ResponseBody<PersonDto>> {
+    override fun create(request: CreatePersonRequestBody): HttpResponse<ResponseBody<PersonDto>> {
         val person = useCase.createPerson(request.firstName, request.lastName)
         val body = ResponseBody.success(person)
         return HttpResponse.ok(body)
@@ -33,7 +33,7 @@ class PersonsController(
         return HttpResponse.ok(body)
     }
 
-    override fun patch(id: String, request: PatchPersonRequest): HttpResponse<ResponseBody<PersonDto>> {
+    override fun patch(id: String, request: PatchPersonRequestBody): HttpResponse<ResponseBody<PersonDto>> {
         val person = useCase.patchPerson(id, request.firstName, request.lastName)
         val body = ResponseBody.success(person)
         return HttpResponse.ok(body)

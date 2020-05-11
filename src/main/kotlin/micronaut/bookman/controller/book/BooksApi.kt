@@ -9,13 +9,13 @@ import javax.validation.constraints.PositiveOrZero
 
 interface BooksApi {
     @Post("/")
-    fun create(request: CreateBookRequest): HttpResponse<ResponseBody<BookDto>>
+    fun create(request: CreateBookRequestBody): HttpResponse<ResponseBody<BookDto>>
     @Get("/{id}")
     fun get(@PathVariable id: String): HttpResponse<ResponseBody<BookDto>>
     @Delete("/{id}")
     fun delete(@PathVariable id: String): HttpResponse<ResponseBody<Unit>>
     @Patch("/{id}")
-    fun patch(@PathVariable id: String, request: PatchBookRequest): HttpResponse<ResponseBody<BookDto>>
+    fun patch(@PathVariable id: String, request: PatchBookRequestBody): HttpResponse<ResponseBody<BookDto>>
 
     @Get("/")
     fun list(
