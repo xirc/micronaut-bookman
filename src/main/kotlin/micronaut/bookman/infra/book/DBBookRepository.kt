@@ -18,6 +18,7 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.joda.time.DateTime
 import java.lang.IllegalArgumentException
+import java.sql.BatchUpdateException
 import java.sql.SQLIntegrityConstraintViolationException
 import javax.inject.Singleton
 import javax.sql.DataSource
@@ -28,8 +29,10 @@ class DBBookRepository(
         private val source: DataSource,
         private val factory: Book.Factory
 ) : BookRepository, DBRepositoryTrait {
+
     data class BookValue(val id: String, val title: String, val createdDate: DateTime, val updatedDate: DateTime)
     data class BookAuthorValue(val bookId: String, val personId: String)
+
     private fun createBookValue(result: ResultRow): BookValue {
         return BookValue(
                 result[BookTable.id],
@@ -44,14 +47,31 @@ class DBBookRepository(
                 result[BookAuthorTable.person_id]
         )
     }
-    private fun createBook(book: BookValue, author: BookAuthorValue?): Book {
+    private fun createBook(book: BookValue, authors: List<BookAuthorValue>): Book {
         return factory.createFromRepository(
                 book.id,
                 book.title,
                 book.createdDate,
                 book.updatedDate,
-                author?.let { BookAuthor(author.personId) }
+                authors.map { BookAuthor((it.personId)) }
         )
+    }
+
+    private fun batchInsertBookAuthor(bookId: String, authors: List<BookAuthor>) {
+        try {
+            BookAuthorTable.deleteWhere { BookAuthorTable.book_id eq bookId }
+            BookAuthorTable.batchInsert(authors) {
+                this[BookAuthorTable.book_id] = bookId
+                this[BookAuthorTable.person_id] = it.personId
+            }
+        } catch (e: ExposedSQLException) {
+            if (e.cause is BatchUpdateException) {
+                // NOTE: 一意に確定させた方がよい？
+                throw NoPersonException(authors.map { it.personId })
+            } else {
+                throw InfraException(e)
+            }
+        }
     }
 
     override fun get(id: String): Book {
@@ -62,11 +82,11 @@ class DBBookRepository(
                             createBookValue(it)
                         }
                         ?: throw NoBookException(id)
-                val bookAuthorValue = BookAuthorTable
-                        .select { BookAuthorTable.book_id eq id }.singleOrNull()?.let {
+                val bookAuthorValues = BookAuthorTable
+                        .select { BookAuthorTable.book_id eq id }.map {
                             createBookAuthorValue(it)
                         }
-                createBook(bookValue, bookAuthorValue)
+                createBook(bookValue, bookAuthorValues)
             }
         }
     }
@@ -88,20 +108,7 @@ class DBBookRepository(
                         throw InfraException(e)
                     }
                 }
-                book.author?.also { author: BookAuthor ->
-                    try {
-                        BookAuthorTable.insert {
-                            it[book_id] = book.id
-                            it[person_id] = author.personId
-                        }
-                    } catch (e: ExposedSQLException) {
-                        if (e.cause is SQLIntegrityConstraintViolationException) {
-                            throw NoPersonException(author.personId)
-                        } else {
-                            throw InfraException(e)
-                        }
-                    }
-                }
+                batchInsertBookAuthor(book.id, book.authors)
                 book
             }
         }
@@ -120,20 +127,7 @@ class DBBookRepository(
                     1 -> Unit
                     else -> throw IllegalDatabaseSchema("Table ${BookTable.tableName} has illegal schema.")
                 }
-                book.author?.let { author: BookAuthor ->
-                    try {
-                        BookAuthorTable.insertOrUpdate(BookAuthorTable.book_id) {
-                            it[book_id] = book.id
-                            it[person_id] = author.personId
-                        }
-                    } catch (e: ExposedSQLException) {
-                        if (e.cause is SQLIntegrityConstraintViolationException) {
-                            throw NoPersonException(author.personId)
-                        } else {
-                            throw InfraException(e)
-                        }
-                    }
-                }
+                batchInsertBookAuthor(book.id, book.authors)
                 book
             }
         }
@@ -154,7 +148,6 @@ class DBBookRepository(
     override fun getPage(page: Long): List<Book> {
         if (page < 0) throw IllegalArgumentException("page should be positive or zero.")
         return transaction(Database.connect(source)) {
-            // Left Join でもいいが、author を複数名にする可能性があるのでこのままにする
             val bookValues = BookTable.selectAll().orderBy(BookTable.updatedDate, SortOrder.DESC)
                     .limit(BookRepository.PageSize, BookRepository.PageSize * page)
                     .map {
@@ -165,9 +158,15 @@ class DBBookRepository(
                     .map {
                         createBookAuthorValue(it)
                     }
-            val authorByBookId = authorValues.associateBy { it.bookId }
+            // Multi-Set がなさそう
+            var authorByBookId = mutableMapOf<String, MutableList<BookAuthorValue>>()
+            for (authorValue in authorValues) {
+                authorByBookId.getOrPut(authorValue.bookId, { mutableListOf()})
+                authorByBookId[authorValue.bookId]?.add(authorValue)
+            }
+
             bookValues.map {
-                createBook(it, authorByBookId[it.id])
+                createBook(it, authorByBookId[it.id] ?: emptyList())
             }
         }
     }

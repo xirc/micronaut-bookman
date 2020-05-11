@@ -14,7 +14,7 @@ class Book private constructor(val id: String, val createdDate: DateTime, privat
             if (value.isBefore(createdDate)) throw IllegalBookStateException("UpdatedDate should be after CreatedDate.")
             field = value
         }
-    var author: BookAuthor? = null
+    var authors: List<BookAuthor> = mutableListOf()
         private set
 
     fun updateTitle(title: String) {
@@ -22,8 +22,8 @@ class Book private constructor(val id: String, val createdDate: DateTime, privat
         this.updatedDate = timeFactory.now()
     }
 
-    fun updateAuthor(author: BookAuthor) {
-        this.author = author
+    fun updateAuthors(authors: List<BookAuthor>) {
+        this.authors = authors
         this.updatedDate = timeFactory.now()
     }
 
@@ -35,11 +35,11 @@ class Book private constructor(val id: String, val createdDate: DateTime, privat
                 title: String,
                 createdDate: DateTime,
                 updatedDate: DateTime,
-                author: BookAuthor?
+                authors: List<BookAuthor>
         ) = Book(id, createdDate, timeFactory).apply {
             this.title = title
             this.updatedDate = updatedDate
-            this.author = author
+            this.authors = authors
         }
     }
 }

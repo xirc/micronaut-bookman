@@ -15,7 +15,7 @@ class BooksController(
 ) : BooksApi {
 
     override fun create(request: CreateBookRequest): HttpResponse<BookResponse> {
-        val book = useCase.createBook(request.title)
+        val book = useCase.createBook(request.title, request.authorIds)
         val body = BookResponse.success(book)
         return HttpResponse.ok(body)
     }
@@ -44,7 +44,7 @@ class BooksController(
 
     override fun patch(id: String, request: PatchBookRequest): HttpResponse<BookResponse> {
         return try {
-            val book = useCase.patchBook(id, request.title, request.authorId)
+            val book = useCase.patchBook(id, request.title, request.authorIds)
             val body = BookResponse.success(book)
             HttpResponse.ok(body)
         } catch (e: NoBookException) {

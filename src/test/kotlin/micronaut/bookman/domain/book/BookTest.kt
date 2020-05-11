@@ -1,5 +1,7 @@
 package micronaut.bookman.domain.book
 
+import io.kotlintest.matchers.collections.shouldBeOneOf
+import io.kotlintest.matchers.collections.shouldContain
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldNotBe
 import io.kotlintest.shouldThrow
@@ -65,9 +67,10 @@ class BookTest : StringSpec({
         val personId = UUID.randomUUID().toString()
         // 更新日時が新しくなるか確認するため時間を進める
         timeFactory.value = timeFactory.value.plusMillis(1)
-        book.updateAuthor(BookAuthor(personId))
-        book.author shouldNotBe null
-        book.author?.personId shouldBe personId
+        val authors = listOf(BookAuthor(personId))
+        book.updateAuthors(authors)
+        book.authors shouldNotBe null
+        book.authors.map { it.personId } shouldContain personId
         book.updatedDate shouldBe timeFactory.value
     }
 

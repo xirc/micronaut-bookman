@@ -1,5 +1,7 @@
 package micronaut.bookman.controller
 
+import io.kotlintest.matchers.collections.shouldBeOneOf
+import io.kotlintest.matchers.collections.shouldContain
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldNotBe
 import io.micronaut.http.HttpStatus
@@ -115,21 +117,22 @@ class BooksControllerTest(
     "BookController can update author of a book" {
         val book = bookFixture.create()
         val person = personFixture.create()
-        val response = client.patch(book.id, PatchBookRequest(null, person.id))
+        val response = client.patch(book.id, PatchBookRequest(null, listOf(person.id)))
         response.status shouldBe HttpStatus.OK
         response.body()!!.run {
             error shouldBe null
             value shouldNotBe null
             value?.id shouldBe book.id
-            value?.author shouldNotBe null
-            value?.author?.id shouldBe person.id
+            val authors = value!!.authors
+            authors.size shouldBe 1
+            authors.map { it.id } shouldContain  person.id
         }
     }
 
     "BookController cannot update author of a book to invalid one" {
         val book = bookFixture.create()
         val personId = UUID.randomUUID().toString()
-        val response = client.patch(book.id, PatchBookRequest(null, personId))
+        val response = client.patch(book.id, PatchBookRequest(null, listOf(personId)))
         response.status shouldBe HttpStatus.OK
         response.body()!!.run {
             value shouldBe null
