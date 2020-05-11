@@ -41,7 +41,7 @@ DELETE /books/{id}
 GET    /persons
 POST   /persons
 GET    /persons/{id}
-PATCH  /psersons/{id}
+PATCH  /persons/{id}
 DELETE /persons/{id}
 
 GET /books/search
