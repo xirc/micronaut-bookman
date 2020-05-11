@@ -1,24 +1,26 @@
 package micronaut.bookman.controller
 
-import io.kotlintest.matchers.collections.shouldBeOneOf
 import io.kotlintest.matchers.collections.shouldContain
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldNotBe
 import io.micronaut.http.HttpStatus
 import io.kotlintest.specs.StringSpec
 import io.micronaut.test.annotation.MicronautTest
+import micronaut.bookman.SpecWithDataSource
 import micronaut.bookman.controller.book.BooksClient
 import micronaut.bookman.controller.book.CreateBookRequest
 import micronaut.bookman.controller.book.PatchBookRequest
 import micronaut.bookman.domain.book.BookRepository
 import java.util.*
+import javax.sql.DataSource
 
 @MicronautTest
 class BooksControllerTest(
+        private val source: DataSource,
         private val client: BooksClient,
         private val bookFixture: BookFixtureClient,
         private val personFixture: PersonFixtureClient
-): StringSpec({
+): SpecWithDataSource(source, {
 
     "BookController can create a book" {
         val response = client.create(CreateBookRequest())
