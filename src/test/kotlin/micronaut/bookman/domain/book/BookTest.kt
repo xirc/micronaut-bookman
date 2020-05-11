@@ -1,6 +1,5 @@
 package micronaut.bookman.domain.book
 
-import io.kotlintest.matchers.collections.shouldBeOneOf
 import io.kotlintest.matchers.collections.shouldContain
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldNotBe
@@ -25,7 +24,7 @@ class BookTest : StringSpec({
 
     "Book has empty default title" {
         val book = factory.create()
-        book.title shouldBe ""
+        book.title shouldBe Book.DefaultTitle
     }
 
     "Book has created date that is exactly same provided by timeFactory" {

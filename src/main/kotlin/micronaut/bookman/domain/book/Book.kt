@@ -7,7 +7,7 @@ import java.util.*
 import javax.inject.Singleton
 
 class Book private constructor(val id: String, val createdDate: DateTime, private val timeFactory: DateTimeFactory) {
-    var title: String = ""
+    var title: String = DefaultTitle
         private set
     var updatedDate: DateTime = createdDate
         private set(value) {
@@ -41,5 +41,9 @@ class Book private constructor(val id: String, val createdDate: DateTime, privat
             this.updatedDate = updatedDate
             this.authors = authors
         }
+    }
+
+    companion object {
+        const val DefaultTitle = ""
     }
 }
