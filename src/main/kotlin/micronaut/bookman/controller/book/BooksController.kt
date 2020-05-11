@@ -37,7 +37,7 @@ class BooksController(
     }
 
     override fun list(page: Int?): HttpResponse<ResponseBody<BookCollectionDto>> {
-        val books = useCase.listBook(page ?: 0)
+        val books = useCase.listBook(page?.toLong() ?: 0)
         val body = ResponseBody.success(books)
         return HttpResponse.ok(body)
     }
