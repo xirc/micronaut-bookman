@@ -1,9 +1,9 @@
-package micronaut.bookman.domain.book.error
+package micronaut.bookman.domain.person.exceptions
 
-class IllegalBookStateException (
+class IllegalPersonStateException(
         override val message: String?,
         override val cause: Throwable?
-) : BookDomainException(message, cause) {
+) : PersonDomainException(message, cause) {
     constructor(message: String?) : this(message, null)
     constructor(cause: Throwable?) : this(cause?.toString(), cause)
     constructor() : this(null, null)

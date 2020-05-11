@@ -9,7 +9,7 @@ import micronaut.bookman.controller.person.CreatePersonRequest
 import micronaut.bookman.controller.person.PatchPersonRequest
 import micronaut.bookman.controller.person.PersonsClient
 import micronaut.bookman.domain.person.PersonRepository
-import micronaut.bookman.error.ErrorCode
+import micronaut.bookman.exceptions.ErrorCode
 import java.util.*
 import javax.sql.DataSource
 

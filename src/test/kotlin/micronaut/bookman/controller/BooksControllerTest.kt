@@ -10,7 +10,7 @@ import micronaut.bookman.controller.book.BooksClient
 import micronaut.bookman.controller.book.CreateBookRequest
 import micronaut.bookman.controller.book.PatchBookRequest
 import micronaut.bookman.domain.book.BookRepository
-import micronaut.bookman.error.ErrorCode
+import micronaut.bookman.exceptions.ErrorCode
 import java.util.*
 import javax.sql.DataSource
 

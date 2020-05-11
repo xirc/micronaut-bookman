@@ -1,6 +1,6 @@
-package micronaut.bookman.domain.book.error
+package micronaut.bookman.domain.book.exceptions
 
-import micronaut.bookman.error.ApplicationException
+import micronaut.bookman.exceptions.ApplicationException
 
 open class BookDomainException(override val message: String?, override val cause: Throwable?) : ApplicationException(message, cause) {
     constructor(message: String?) : this(message, null)

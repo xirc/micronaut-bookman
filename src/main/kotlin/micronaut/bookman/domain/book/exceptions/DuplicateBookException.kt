@@ -1,4 +1,4 @@
-package micronaut.bookman.domain.book.error
+package micronaut.bookman.domain.book.exceptions
 
 class DuplicateBookException private constructor(
         override val message: String?,

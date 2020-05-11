@@ -2,11 +2,11 @@ package micronaut.bookman.controller.book
 
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.*
-import micronaut.bookman.error.BookErrorResponseSyntax.toResponseBody
-import micronaut.bookman.error.PersonErrorResponseSyntax.toResponseBody
+import micronaut.bookman.exceptions.BookErrorResponseSyntax.toResponseBody
+import micronaut.bookman.exceptions.PersonErrorResponseSyntax.toResponseBody
 import micronaut.bookman.controller.UnitResponse
-import micronaut.bookman.domain.book.error.NoBookException
-import micronaut.bookman.domain.person.error.NoPersonException
+import micronaut.bookman.domain.book.exceptions.NoBookException
+import micronaut.bookman.domain.person.exceptions.NoPersonException
 import micronaut.bookman.usecase.LibrarianBookUseCase
 
 @Controller("/books")

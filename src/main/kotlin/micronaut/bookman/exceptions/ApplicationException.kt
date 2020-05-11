@@ -1,4 +1,4 @@
-package micronaut.bookman.error
+package micronaut.bookman.exceptions
 
 open class ApplicationException(override val message: String?, override val cause: Throwable?) : Throwable(message, cause) {
     constructor(message: String?) : this(message, null)

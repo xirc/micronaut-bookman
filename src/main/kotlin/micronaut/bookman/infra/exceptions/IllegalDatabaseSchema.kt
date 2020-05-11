@@ -1,4 +1,4 @@
-package micronaut.bookman.infra.error
+package micronaut.bookman.infra.exceptions
 
 class IllegalDatabaseSchema(override val message: String?, override val cause: Throwable?) : InfraException(message, cause) {
     constructor(message: String?) : this(message, null)

@@ -1,6 +1,6 @@
 package micronaut.bookman.domain.book
 
-import micronaut.bookman.domain.book.error.IllegalBookStateException
+import micronaut.bookman.domain.book.exceptions.IllegalBookStateException
 import micronaut.bookman.domain.time.DateTimeFactory
 import org.joda.time.DateTime
 import java.util.*
