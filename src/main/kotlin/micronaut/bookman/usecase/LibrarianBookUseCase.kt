@@ -21,7 +21,9 @@ class LibrarianBookUseCase(
 
     fun createBook(title: String? = null, authorIds: List<String>? = null): BookDto {
         val book = factory.create()
-        book.updateTitle(title ?: "")
+        if (title != null) {
+            book.updateTitle(title)
+        }
         authorIds?.also {
             book.updateAuthors(it.map { id -> BookAuthor(id) })
         }
