@@ -26,12 +26,12 @@ class DBPersonRepositoryTest(
     val repository = DBPersonRepository(source, factory)
 
     "DBPersonRepository can create a person" {
-        val person = factory.create(FullName("Harry", "Potter"))
+        val person = factory.create()
         repository.save(person)
     }
 
     "DBPersonRepository cannot create a person twice" {
-        val person = factory.create(FullName("Harry", "Potter"))
+        val person = factory.create()
         shouldNotThrowAny {
             repository.save(person)
         }
@@ -73,7 +73,7 @@ class DBPersonRepositoryTest(
     }
 
     "DBPersonRepository cannot update a person with invalid ID" {
-        val person = factory.create(FullName("Harry", "Potter"))
+        val person = factory.create()
         shouldThrow<NoPersonException> {
             repository.update(person)
         }
@@ -90,7 +90,7 @@ class DBPersonRepositoryTest(
     }
 
     "DBPersonRepository cannot delete a person with invalid ID" {
-        val person = factory.create(FullName("Harry", "Potter"))
+        val person = factory.create()
         shouldThrow<NoPersonException> {
             repository.get(person.id)
         }
