@@ -6,7 +6,7 @@ import micronaut.bookman.domain.person.Person
 import micronaut.bookman.domain.person.PersonRepository
 import micronaut.bookman.domain.person.error.DuplicatePersonException
 import micronaut.bookman.domain.person.error.NoPersonException
-import micronaut.bookman.infra.DBRepositoryTrait
+import micronaut.bookman.infra.DatabaseTrait
 import micronaut.bookman.infra.schema.PersonTable
 import micronaut.bookman.infra.error.IllegalDatabaseSchema
 import micronaut.bookman.infra.error.InfraException
@@ -23,7 +23,7 @@ import javax.sql.DataSource
 class DBPersonRepository(
         private val source: DataSource,
         private val factory: Person.Factory
-) : PersonRepository, DBRepositoryTrait {
+) : PersonRepository, DatabaseTrait {
     private fun createPerson(result: ResultRow): Person {
         return factory.createFromRepository(
                 result[PersonTable.id],

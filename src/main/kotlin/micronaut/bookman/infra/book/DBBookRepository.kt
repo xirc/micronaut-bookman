@@ -9,7 +9,7 @@ import micronaut.bookman.domain.book.error.NoBookException
 import micronaut.bookman.domain.person.error.NoPersonException
 import micronaut.bookman.infra.schema.BookAuthorTable
 import micronaut.bookman.infra.schema.BookTable
-import micronaut.bookman.infra.DBRepositoryTrait
+import micronaut.bookman.infra.DatabaseTrait
 import micronaut.bookman.infra.error.IllegalDatabaseSchema
 import micronaut.bookman.infra.error.InfraException
 import org.jetbrains.exposed.exceptions.ExposedSQLException
@@ -27,7 +27,7 @@ import javax.sql.DataSource
 class DBBookRepository(
         private val source: DataSource,
         private val factory: Book.Factory
-) : BookRepository, DBRepositoryTrait {
+) : BookRepository, DatabaseTrait {
 
     data class BookValue(val id: String, val title: String, val createdDate: DateTime, val updatedDate: DateTime)
     data class BookAuthorValue(val bookId: String, val personId: String)
