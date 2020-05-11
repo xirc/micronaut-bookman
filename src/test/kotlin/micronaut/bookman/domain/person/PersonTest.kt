@@ -20,69 +20,71 @@ class PersonTest : StringSpec({
     val timeFactory = ConstantDateTimeFactory(DateTime.now().minusDays(1))
     val swFactory = Person.Factory(timeFactory)
 
-    "Person has his/her name" {
-        val name = FullName("Harry", "Potter")
-        val person = factory.create(name)
-        person.name shouldBe name
+    "Person has default name" {
+        val person = factory.create()
+        person.name shouldBe Person.DefaultName
     }
 
     "Person has created date that is exactly same provided by timeFactory" {
-        val person = swFactory.create(FullName("Harry", "Potter"))
+        val person = swFactory.create()
         person.createdDate shouldBe timeFactory.value
     }
 
     "Person has updated date that is exactly same provided by timeFactory" {
-        val person = swFactory.create(FullName("Harry", "Potter"))
+        val person = swFactory.create()
         person.updatedDate shouldBe timeFactory.value
     }
 
     "Person has updated date that should be exactly equal to created date as default" {
-        val person = factory.create(FullName("Harry", "Potter"))
+        val person = factory.create()
         person.updatedDate shouldBe person.createdDate
     }
 
-    "Different persons can have same name." {
-        val name = FullName("Harry", "Potter")
-        val person1 = factory.create(name)
-        val person2 = factory.create(name)
-        person1.name shouldBe person2.name
-        person1.id shouldNotBe person2.id
-    }
-
-    "Person can change his/her first name" {
-        val name = FullName("Harry", "Potter")
-        val person = swFactory.create(name)
+    "Person can change his/her name" {
+        val person = swFactory.create()
 
         // 更新日時が新しくなるように時間を進める
         timeFactory.value = timeFactory.value.plusMillis(1)
 
-        val newFirstName = "Ronald"
-        person.updateFirstName(newFirstName)
+        val name = FullName("Harry", "Potter")
+        person.updateName(name)
         person.also {
-            it.name.firstName shouldBe newFirstName
-            it.name.lastName shouldBe name.lastName
+            it.name shouldBe name
+            it.updatedDate shouldBe timeFactory.value
+        }
+    }
+    "Person can change his/her first name" {
+        val person = swFactory.create()
+
+        // 更新日時が新しくなるように時間を進める
+        timeFactory.value = timeFactory.value.plusMillis(1)
+
+        val firstName = "Ronald"
+        person.updateFirstName(firstName)
+        person.also {
+            it.name.firstName shouldBe firstName
+            it.name.lastName shouldBe Person.DefaultName.lastName
             it.updatedDate shouldBe timeFactory.value
         }
     }
 
     "Person can change his/her last name" {
-        val name = FullName("Harry", "Potter")
-        val person = swFactory.create(name)
+        val person = swFactory.create()
 
         // 更新日時が新しくなるように時間を進める
         timeFactory.value = timeFactory.value.plusMillis(1)
 
-        val newLastName = "Weasley"
-        person.updateLastName(newLastName)
+        val lastName = "Weasley"
+        person.updateLastName(lastName)
         person.also {
-            it.name.firstName shouldBe name.firstName
-            it.name.lastName shouldBe newLastName
+            it.name.firstName shouldBe Person.DefaultName.lastName
+            it.name.lastName shouldBe lastName
             it.updatedDate shouldBe timeFactory.value
         }
     }
 
     "Person cannot have updated date that is before created date" {
-        val person = swFactory.create(FullName("Harry", "Potter"))
+        val person = swFactory.create()
         // 更新に失敗するか確認するため時間を巻き戻す
         timeFactory.value = timeFactory.value.minusMillis(1)
         shouldThrow<IllegalPersonStateException> {

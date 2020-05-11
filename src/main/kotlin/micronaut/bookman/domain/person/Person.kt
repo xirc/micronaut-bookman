@@ -11,7 +11,7 @@ class Person private constructor(
         val id: String,
         val createdDate: DateTime
 ) {
-    var name: FullName = FullName("", "")
+    var name: FullName = DefaultName
         private set
     var updatedDate: DateTime = createdDate
         private set(value) {
@@ -19,6 +19,10 @@ class Person private constructor(
             field = value
         }
 
+    fun updateName(name: FullName) {
+        this.name = name
+        updatedDate = timeFactory.now()
+    }
     fun updateFirstName(firstName: String) {
         name = name.copy(firstName = firstName)
         updatedDate = timeFactory.now()
@@ -30,13 +34,11 @@ class Person private constructor(
 
     @Singleton
     class Factory(private val timeFactory: DateTimeFactory) {
-        fun create(name: FullName): Person = Person(
+        fun create(): Person = Person(
                 timeFactory,
                 UUID.randomUUID().toString(),
                 timeFactory.now()
-        ).apply {
-            this.name = name
-        }
+        )
         fun createFromRepository(
                 id: String,
                 name: FullName,
@@ -50,5 +52,9 @@ class Person private constructor(
             this.name = name
             this.updatedDate = updatedDate
         }
+    }
+
+    companion object {
+        val DefaultName = FullName("", "")
     }
 }

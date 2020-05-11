@@ -17,16 +17,17 @@ class DBPersonFixture
 
     fun create(): Person {
         val q = UUID.randomUUID().toString()
-        val person = personFactory.create(FullName("f$q", "l$q"))
-        personRepository.save(person)
-        return person
+        val person = personFactory.create()
+        person.updateName(FullName("f$q", "l$q"))
+        return personRepository.save(person)
     }
     fun createCollection(n: Int): List<Person> {
         // TODO Batch Insert する
         var persons = mutableListOf<Person>()
         for (i in 0 until n ) {
             val q = UUID.randomUUID().toString()
-            val person = personFactory.create(FullName("f$i$q", "l$i$q"))
+            val person = personFactory.create()
+            person.updateName(FullName("f$i$q", "l$i$q"))
             val savedPerson = personRepository.save(person)
             persons.add(savedPerson)
         }

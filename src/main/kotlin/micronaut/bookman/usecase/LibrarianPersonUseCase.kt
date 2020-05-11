@@ -1,6 +1,5 @@
 package micronaut.bookman.usecase
 
-import micronaut.bookman.domain.person.FullName
 import micronaut.bookman.domain.person.Person
 import micronaut.bookman.domain.person.PersonRepository
 import javax.inject.Singleton
@@ -16,8 +15,13 @@ class LibrarianPersonUseCase(
     }
 
     fun createPerson(firstName: String? = null, lastName: String? = null): PersonDto {
-        val name = FullName(firstName ?: "", lastName ?: "")
-        val person = factory.create(name)
+        val person = factory.create()
+        firstName?.also {
+            person.updateFirstName(it)
+        }
+        lastName?.also {
+            person.updateLastName(it)
+        }
         repository.save(person)
         return PersonDto.createFrom(person)
     }
