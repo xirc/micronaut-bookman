@@ -54,11 +54,11 @@ class LibrarianBookUseCase(
     }
 
     fun listBook(
-            page: Int
+            page: Long
     ): BookCollectionDto {
         if (page < 0) throw AppIllegalArgumentException("page should be positive or zero.")
-        val books = repository.getPage(page.toLong())
-        val pageCount = repository.countPage(page.toLong())
+        val books = repository.getPage(page)
+        val pageCount = repository.countPage(page)
         val persons = personRepository.getAll(books.flatMap { it.authors.map { author -> author.personId } })
         var personById = persons.associateBy { it.id }
         val bookDtoList = books.map {

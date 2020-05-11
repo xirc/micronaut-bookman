@@ -176,10 +176,12 @@ class DBBookRepository(
         if (offsetPage < 0) throw AppIllegalArgumentException("offsetPage should be positive or zero.")
         return withUtcZone {
             transaction(Database.connect(source)) {
-                BookTable.selectAll().orderBy(BookTable.updatedDate, SortOrder.DESC).limit(
-                        BookRepository.PageSize * BookRepository.MaxPageCount,
-                        BookRepository.PageSize * offsetPage
-                ).count() / BookRepository.PageSize
+                BookTable.slice(BookTable.id, BookTable.updatedDate).selectAll()
+                        .orderBy(BookTable.updatedDate, SortOrder.DESC)
+                        .limit(
+                                BookRepository.PageSize * BookRepository.MaxPageCount,
+                                BookRepository.PageSize * offsetPage
+                        ).count() / BookRepository.PageSize
             }
         }
     }
