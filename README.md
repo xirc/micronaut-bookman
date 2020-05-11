@@ -32,15 +32,17 @@ Password is `password`.
 
 Here are API Endpoints.
 ```
-GET /books
-POST /books
-GET /books/{id}
-PATCH /books/{id}
+GET    /books
+POST   /books
+GET    /books/{id}
+PATCH  /books/{id}
+DELETE /books/{id}
 
-GET /persons
-POST /persons
-GET /persons/{id}
-PATCH /psersons/{id}
+GET    /persons
+POST   /persons
+GET    /persons/{id}
+PATCH  /psersons/{id}
+DELETE /persons/{id}
 
 GET /books/search
 GET /persons/search
