@@ -5,17 +5,20 @@ import io.kotlintest.shouldNotBe
 import io.kotlintest.specs.StringSpec
 import io.micronaut.http.HttpStatus
 import io.micronaut.test.annotation.MicronautTest
+import micronaut.bookman.SpecWithDataSource
 import micronaut.bookman.controller.person.CreatePersonRequest
 import micronaut.bookman.controller.person.PatchPersonRequest
 import micronaut.bookman.controller.person.PersonsClient
 import micronaut.bookman.domain.person.PersonRepository
 import java.util.*
+import javax.sql.DataSource
 
 @MicronautTest
 class PersonsControllerTest(
-    private val client: PersonsClient,
-    private val personFixture: PersonFixtureClient
-): StringSpec({
+        private val source: DataSource,
+        private val client: PersonsClient,
+        private val personFixture: PersonFixtureClient
+): SpecWithDataSource(source, {
 
     "PersonController can create a person" {
         val response = client.create(CreatePersonRequest())
@@ -117,7 +120,7 @@ class PersonsControllerTest(
     }
 
     "PersonController can list persons" {
-        // 3 pages
+        // 4 pages
         personFixture.createCollection(PersonRepository.PageSize * 3 + 1)
         val response = client.list(1)
         response.status shouldBe HttpStatus.OK
@@ -126,6 +129,19 @@ class PersonsControllerTest(
             value shouldNotBe null
             value?.pageCount shouldBe 2
             value?.persons?.size shouldBe PersonRepository.PageSize
+        }
+    }
+
+    "PersonController can search persons" {
+        // 4 pages
+        personFixture.createCollection(PersonRepository.PageSize * 3 + 1)
+        val response = client.search("f", 1 )
+        response.status shouldBe HttpStatus.OK
+        response.body()!!.run {
+            error shouldBe null
+            value shouldNotBe null
+            value?.pageCount shouldBe 2
+            value?.results?.size shouldBe PersonRepository.PageSize
         }
     }
 

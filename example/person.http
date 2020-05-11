@@ -28,3 +28,6 @@ Content-Type: {{type}}
 
 ###
 GET {{url}}/persons?page=0
+
+###
+GET {{url}}/persons/search?query=a
