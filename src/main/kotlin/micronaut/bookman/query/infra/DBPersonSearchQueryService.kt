@@ -20,6 +20,11 @@ class DBPersonSearchQueryService(
         private val source: DataSource
 ) : PersonSearchQueryService, DatabaseTrait {
 
+    /*
+    TODO (HACK) THIS IMPLEMENTATION IS NAIVE and AWFUL.
+     DONT in USE PRODUCTION.
+     */
+
     private fun buildSearchQuery(query: String): Query {
         return PersonTable.selectAll()
                 .orWhere { PersonTable.firstName like "%$query%" }
@@ -27,7 +32,6 @@ class DBPersonSearchQueryService(
                 .orderBy(PersonTable.updatedDate, SortOrder.DESC)
     }
 
-    // TODO (HACK) THIS IMPLEMENTATION IS NAIVE and AWFUL. DONT in USE PRODUCTION.
     override fun searchAll(query: String, page: Long): PersonSearchQueryResultSet {
         if (page < 0) throw AppIllegalArgumentException("page should be positive or zero.")
         if (query.isBlank()) throw AppIllegalArgumentException("query should be non blank.")
