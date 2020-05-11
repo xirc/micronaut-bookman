@@ -10,6 +10,7 @@ import micronaut.bookman.controller.person.PatchPersonRequestBody
 import micronaut.bookman.controller.person.PersonsClient
 import micronaut.bookman.domain.person.PersonRepository
 import micronaut.bookman.exceptions.ErrorCode
+import micronaut.bookman.query.PersonSearchQueryService
 import java.util.*
 import javax.sql.DataSource
 
@@ -144,7 +145,7 @@ class PersonsControllerTest(
 
     "PersonController can search persons" {
         // 4 pages
-        personFixture.createCollection(PersonRepository.PageSize * 3 + 1)
+        personFixture.createCollection(PersonSearchQueryService.PageSize * 3 + 1)
         val response = client.search("f", 1 )
         response.status shouldBe HttpStatus.OK
         response.body()!!.run {
