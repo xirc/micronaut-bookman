@@ -9,10 +9,9 @@ import micronaut.bookman.domain.book.error.NoBookException
 import micronaut.bookman.domain.person.error.NoPersonException
 import micronaut.bookman.infra.schema.BookAuthorTable
 import micronaut.bookman.infra.schema.BookTable
-import micronaut.bookman.infra.DBRepositoryTrait
+import micronaut.bookman.infra.DatabaseTrait
 import micronaut.bookman.infra.error.IllegalDatabaseSchema
 import micronaut.bookman.infra.error.InfraException
-import micronaut.bookman.infra.extension.insertOrUpdate
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -28,7 +27,7 @@ import javax.sql.DataSource
 class DBBookRepository(
         private val source: DataSource,
         private val factory: Book.Factory
-) : BookRepository, DBRepositoryTrait {
+) : BookRepository, DatabaseTrait {
 
     data class BookValue(val id: String, val title: String, val createdDate: DateTime, val updatedDate: DateTime)
     data class BookAuthorValue(val bookId: String, val personId: String)
@@ -75,8 +74,8 @@ class DBBookRepository(
     }
 
     override fun get(id: String): Book {
-        return transaction (Database.connect(source)) {
-            withUtcZone {
+        return withUtcZone {
+            transaction(Database.connect(source)) {
                 val bookValue = BookTable
                         .select { BookTable.id eq id }.singleOrNull()?.let {
                             createBookValue(it)
@@ -92,8 +91,8 @@ class DBBookRepository(
     }
 
     override fun save(book: Book): Book {
-        return transaction (Database.connect(source)) {
-            withUtcZone {
+        return withUtcZone {
+            transaction(Database.connect(source)) {
                 try {
                     BookTable.insert {
                         it[id] = book.id
@@ -115,8 +114,8 @@ class DBBookRepository(
     }
 
     override fun update(book: Book): Book {
-        return transaction (Database.connect(source)) {
-            withUtcZone {
+        return withUtcZone {
+            transaction(Database.connect(source)) {
                 val count = BookTable.update({ BookTable.id eq book.id }) {
                     it[title] = book.title
                     it[createdDate] = book.createdDate
@@ -147,37 +146,41 @@ class DBBookRepository(
 
     override fun getPage(page: Long): List<Book> {
         if (page < 0) throw IllegalArgumentException("page should be positive or zero.")
-        return transaction(Database.connect(source)) {
-            val bookValues = BookTable.selectAll().orderBy(BookTable.updatedDate, SortOrder.DESC)
-                    .limit(BookRepository.PageSize, BookRepository.PageSize * page)
-                    .map {
-                        createBookValue(it)
-                    }
-            val authorValues = BookAuthorTable.selectAll()
-                    .orWhere { BookAuthorTable.book_id inList bookValues.map { it.id } }
-                    .map {
-                        createBookAuthorValue(it)
-                    }
-            // Multi-Set がなさそう
-            var authorByBookId = mutableMapOf<String, MutableList<BookAuthorValue>>()
-            for (authorValue in authorValues) {
-                authorByBookId.getOrPut(authorValue.bookId, { mutableListOf()})
-                authorByBookId[authorValue.bookId]?.add(authorValue)
-            }
+        return withUtcZone {
+            transaction(Database.connect(source)) {
+                val bookValues = BookTable.selectAll().orderBy(BookTable.updatedDate, SortOrder.DESC)
+                        .limit(BookRepository.PageSize, BookRepository.PageSize * page)
+                        .map {
+                            createBookValue(it)
+                        }
+                val authorValues = BookAuthorTable.selectAll()
+                        .orWhere { BookAuthorTable.book_id inList bookValues.map { it.id } }
+                        .map {
+                            createBookAuthorValue(it)
+                        }
+                // Multi-Set がなさそう
+                var authorByBookId = mutableMapOf<String, MutableList<BookAuthorValue>>()
+                for (authorValue in authorValues) {
+                    authorByBookId.getOrPut(authorValue.bookId, { mutableListOf() })
+                    authorByBookId[authorValue.bookId]?.add(authorValue)
+                }
 
-            bookValues.map {
-                createBook(it, authorByBookId[it.id] ?: emptyList())
+                bookValues.map {
+                    createBook(it, authorByBookId[it.id] ?: emptyList())
+                }
             }
         }
     }
 
     override fun countPage(offsetPage: Long): Long {
         if (offsetPage < 0) throw IllegalArgumentException("offsetPage should be positive or zero.")
-        return transaction(Database.connect(source)) {
-            BookTable.selectAll().orderBy(BookTable.updatedDate, SortOrder.DESC).limit(
-                    BookRepository.PageSize * BookRepository.MaxPageCount,
-                    BookRepository.PageSize * offsetPage
-            ).count() / BookRepository.PageSize
+        return withUtcZone {
+            transaction(Database.connect(source)) {
+                BookTable.selectAll().orderBy(BookTable.updatedDate, SortOrder.DESC).limit(
+                        BookRepository.PageSize * BookRepository.MaxPageCount,
+                        BookRepository.PageSize * offsetPage
+                ).count() / BookRepository.PageSize
+            }
         }
     }
 }
