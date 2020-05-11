@@ -7,6 +7,7 @@ import micronaut.bookman.domain.book.BookRepository
 import micronaut.bookman.domain.book.exceptions.DuplicateBookException
 import micronaut.bookman.domain.book.exceptions.NoBookException
 import micronaut.bookman.domain.person.exceptions.NoPersonException
+import micronaut.bookman.exceptions.AppIllegalArgumentException
 import micronaut.bookman.infra.schema.BookAuthorTable
 import micronaut.bookman.infra.schema.BookTable
 import micronaut.bookman.infra.DatabaseTrait
@@ -16,7 +17,6 @@ import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.joda.time.DateTime
-import java.lang.IllegalArgumentException
 import java.sql.BatchUpdateException
 import java.sql.SQLIntegrityConstraintViolationException
 import javax.inject.Singleton
@@ -145,7 +145,7 @@ class DBBookRepository(
     }
 
     override fun getPage(page: Long): List<Book> {
-        if (page < 0) throw IllegalArgumentException("page should be positive or zero.")
+        if (page < 0) throw AppIllegalArgumentException("page should be positive or zero.")
         return withUtcZone {
             transaction(Database.connect(source)) {
                 val bookValues = BookTable.selectAll().orderBy(BookTable.updatedDate, SortOrder.DESC)
@@ -173,7 +173,7 @@ class DBBookRepository(
     }
 
     override fun countPage(offsetPage: Long): Long {
-        if (offsetPage < 0) throw IllegalArgumentException("offsetPage should be positive or zero.")
+        if (offsetPage < 0) throw AppIllegalArgumentException("offsetPage should be positive or zero.")
         return withUtcZone {
             transaction(Database.connect(source)) {
                 BookTable.selectAll().orderBy(BookTable.updatedDate, SortOrder.DESC).limit(

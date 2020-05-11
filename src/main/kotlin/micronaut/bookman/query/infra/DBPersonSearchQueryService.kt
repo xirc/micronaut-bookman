@@ -1,6 +1,7 @@
 package micronaut.bookman.query.infra
 
 import io.micronaut.context.annotation.Primary
+import micronaut.bookman.exceptions.AppIllegalArgumentException
 import micronaut.bookman.infra.DatabaseTrait
 import micronaut.bookman.infra.schema.PersonTable
 import micronaut.bookman.query.PersonSearchQueryResult
@@ -28,8 +29,8 @@ class DBPersonSearchQueryService(
 
     // TODO (HACK) THIS IMPLEMENTATION IS NAIVE and AWFUL. DONT in USE PRODUCTION.
     override fun searchAll(query: String, page: Long): PersonSearchQueryResultSet {
-        if (page < 0) throw IllegalArgumentException("page should be positive or zero.")
-        if (query.isBlank()) throw IllegalArgumentException("query should be non blank.")
+        if (page < 0) throw AppIllegalArgumentException("page should be positive or zero.")
+        if (query.isBlank()) throw AppIllegalArgumentException("query should be non blank.")
         return withUtcZone {
             transaction(Database.connect(source)) {
                 val itemCount = buildSearchQuery(query)
