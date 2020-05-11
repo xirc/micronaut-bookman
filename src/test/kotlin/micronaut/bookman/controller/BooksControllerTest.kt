@@ -4,13 +4,13 @@ import io.kotlintest.matchers.collections.shouldContain
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldNotBe
 import io.micronaut.http.HttpStatus
-import io.kotlintest.specs.StringSpec
 import io.micronaut.test.annotation.MicronautTest
 import micronaut.bookman.SpecWithDataSource
 import micronaut.bookman.controller.book.BooksClient
-import micronaut.bookman.controller.book.CreateBookRequest
-import micronaut.bookman.controller.book.PatchBookRequest
+import micronaut.bookman.controller.book.CreateBookRequestBody
+import micronaut.bookman.controller.book.PatchBookRequestBody
 import micronaut.bookman.domain.book.BookRepository
+import micronaut.bookman.exceptions.ErrorCode
 import java.util.*
 import javax.sql.DataSource
 
@@ -23,7 +23,7 @@ class BooksControllerTest(
 ): SpecWithDataSource(source, {
 
     "BookController can create a book" {
-        val response = client.create(CreateBookRequest())
+        val response = client.create(CreateBookRequestBody())
         response.status shouldBe HttpStatus.OK
         response.body()!!.run {
             error shouldBe null
@@ -33,7 +33,7 @@ class BooksControllerTest(
 
     "BookController can create a book with title" {
         val title = "title ${UUID.randomUUID()}"
-        val response = client.create(CreateBookRequest(title))
+        val response = client.create(CreateBookRequestBody(title))
         response.status shouldBe HttpStatus.OK
         response.body()!!.run {
             error shouldBe null
@@ -43,8 +43,8 @@ class BooksControllerTest(
     }
 
     "BookController should create books that have different IDs" {
-        val response1 = client.create(CreateBookRequest("title"))
-        val response2 = client.create(CreateBookRequest("title"))
+        val response1 = client.create(CreateBookRequestBody("title"))
+        val response2 = client.create(CreateBookRequestBody("title"))
         val book1 = response1.body.get().value!!
         val book2 = response2.body.get().value!!
         assert(book1.id != book2.id)
@@ -95,7 +95,7 @@ class BooksControllerTest(
     "Book Controller can update a book title" {
         val book = bookFixture.create()
         val newTitle = "new book title"
-        val response = client.patch(book.id, PatchBookRequest(newTitle, null))
+        val response = client.patch(book.id, PatchBookRequestBody(newTitle, null))
         response.status shouldBe HttpStatus.OK
         response.body()!!.run {
             error shouldBe null
@@ -107,7 +107,7 @@ class BooksControllerTest(
 
     "Book Controller cannot update a book title with invalid ID" {
         val id = UUID.randomUUID().toString()
-        val response = client.patch(id, PatchBookRequest("new title", null))
+        val response = client.patch(id, PatchBookRequestBody("new title", null))
         response.status shouldBe HttpStatus.OK
         response.body()!!.run {
             value shouldBe null
@@ -119,7 +119,7 @@ class BooksControllerTest(
     "BookController can update author of a book" {
         val book = bookFixture.create()
         val person = personFixture.create()
-        val response = client.patch(book.id, PatchBookRequest(null, listOf(person.id)))
+        val response = client.patch(book.id, PatchBookRequestBody(null, listOf(person.id)))
         response.status shouldBe HttpStatus.OK
         response.body()!!.run {
             error shouldBe null
@@ -134,7 +134,7 @@ class BooksControllerTest(
     "BookController cannot update author of a book to invalid one" {
         val book = bookFixture.create()
         val personId = UUID.randomUUID().toString()
-        val response = client.patch(book.id, PatchBookRequest(null, listOf(personId)))
+        val response = client.patch(book.id, PatchBookRequestBody(null, listOf(personId)))
         response.status shouldBe HttpStatus.OK
         response.body()!!.run {
             value shouldBe null

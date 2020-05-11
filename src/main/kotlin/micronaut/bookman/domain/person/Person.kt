@@ -1,6 +1,6 @@
 package micronaut.bookman.domain.person
 
-import micronaut.bookman.domain.person.error.IllegalPersonStateException
+import micronaut.bookman.domain.person.exceptions.IllegalPersonStateException
 import micronaut.bookman.domain.time.DateTimeFactory
 import org.joda.time.DateTime
 import java.util.*

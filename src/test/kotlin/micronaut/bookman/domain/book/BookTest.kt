@@ -7,7 +7,7 @@ import io.kotlintest.shouldThrow
 import io.kotlintest.specs.StringSpec
 import io.micronaut.test.annotation.MicronautTest
 import micronaut.bookman.domain.ConstantDateTimeFactory
-import micronaut.bookman.domain.book.error.IllegalBookStateException
+import micronaut.bookman.domain.book.exceptions.IllegalBookStateException
 import micronaut.bookman.domain.time.ServerDateTimeFactory
 import org.joda.time.DateTime
 import java.util.*

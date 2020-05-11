@@ -1,8 +1,10 @@
-package micronaut.bookman.domain.book.error
+package micronaut.bookman.domain.book.exceptions
+
+import micronaut.bookman.exceptions.ErrorCode
 
 class NoBookException private constructor(
         override val message: String?,
         override val cause: Throwable?
-) : BookDomainException(message, cause) {
+) : BookDomainException(ErrorCode.BOOK_NOT_FOUND, message, cause) {
     constructor(id: String) : this("Book(id = ${id})", null)
 }

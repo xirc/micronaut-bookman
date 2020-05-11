@@ -1,12 +1,11 @@
 package micronaut.bookman.domain.person
 
 import io.kotlintest.shouldBe
-import io.kotlintest.shouldNotBe
 import io.kotlintest.shouldThrow
 import io.kotlintest.specs.StringSpec
 import io.micronaut.test.annotation.MicronautTest
 import micronaut.bookman.domain.ConstantDateTimeFactory
-import micronaut.bookman.domain.person.error.IllegalPersonStateException
+import micronaut.bookman.domain.person.exceptions.IllegalPersonStateException
 import micronaut.bookman.domain.time.ServerDateTimeFactory
 import org.joda.time.DateTime
 

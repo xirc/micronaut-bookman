@@ -2,14 +2,14 @@ package micronaut.bookman.controller
 
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldNotBe
-import io.kotlintest.specs.StringSpec
 import io.micronaut.http.HttpStatus
 import io.micronaut.test.annotation.MicronautTest
 import micronaut.bookman.SpecWithDataSource
-import micronaut.bookman.controller.person.CreatePersonRequest
-import micronaut.bookman.controller.person.PatchPersonRequest
+import micronaut.bookman.controller.person.CreatePersonRequestBody
+import micronaut.bookman.controller.person.PatchPersonRequestBody
 import micronaut.bookman.controller.person.PersonsClient
 import micronaut.bookman.domain.person.PersonRepository
+import micronaut.bookman.exceptions.ErrorCode
 import java.util.*
 import javax.sql.DataSource
 
@@ -21,7 +21,7 @@ class PersonsControllerTest(
 ): SpecWithDataSource(source, {
 
     "PersonController can create a person" {
-        val response = client.create(CreatePersonRequest())
+        val response = client.create(CreatePersonRequestBody())
         response.status shouldBe HttpStatus.OK
         response.body()!!.run {
             error shouldBe null
@@ -32,7 +32,7 @@ class PersonsControllerTest(
     "PersonController can create a person with name" {
         val firstName = "first ${UUID.randomUUID()}"
         val lastName = "last ${UUID.randomUUID()}"
-        val response = client.create(CreatePersonRequest(firstName, lastName))
+        val response = client.create(CreatePersonRequestBody(firstName, lastName))
         response.status shouldBe HttpStatus.OK
         response.body()!!.run {
             error shouldBe null
@@ -43,8 +43,8 @@ class PersonsControllerTest(
     }
 
     "PersonController should create persons that have different IDs" {
-        val response1 = client.create(CreatePersonRequest("Harry", "Potter"))
-        val response2 = client.create(CreatePersonRequest("Harry", "Potter"))
+        val response1 = client.create(CreatePersonRequestBody("Harry", "Potter"))
+        val response2 = client.create(CreatePersonRequestBody("Harry", "Potter"))
         val person1 = response1.body.get().value!!
         val person2 = response2.body.get().value!!
         assert(person1.id != person2.id)
@@ -97,7 +97,7 @@ class PersonsControllerTest(
         val person = personFixture.create()
         val newFirstName = "firstName"
         val newLastName = "lastName"
-        val response = client.patch(person.id, PatchPersonRequest(newFirstName, newLastName))
+        val response = client.patch(person.id, PatchPersonRequestBody(newFirstName, newLastName))
         response.status shouldBe HttpStatus.OK
         response.body()!!.run {
             error shouldBe null
@@ -110,7 +110,7 @@ class PersonsControllerTest(
 
     "PersonController cannot update name of person with invalid ID" {
         val id = UUID.randomUUID().toString()
-        val response = client.patch(id, PatchPersonRequest("first", "last"))
+        val response = client.patch(id, PatchPersonRequestBody("first", "last"))
         response.status shouldBe HttpStatus.OK
         response.body()!!.run {
             value shouldBe null

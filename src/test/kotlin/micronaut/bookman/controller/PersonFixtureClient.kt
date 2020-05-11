@@ -1,6 +1,6 @@
 package micronaut.bookman.controller
 
-import micronaut.bookman.controller.person.CreatePersonRequest
+import micronaut.bookman.controller.person.CreatePersonRequestBody
 import micronaut.bookman.controller.person.PersonsClient
 import micronaut.bookman.usecase.PersonDto
 import java.util.*
@@ -14,7 +14,7 @@ class PersonFixtureClient(
         val q = UUID.randomUUID().toString()
         val firstName = "f$q"
         val lastName = "l$q"
-        val response = client.create(CreatePersonRequest(firstName, lastName))
+        val response = client.create(CreatePersonRequestBody(firstName, lastName))
         return response.body()?.value!!
     }
     fun createCollection(n: Int): List<PersonDto> {
@@ -23,7 +23,7 @@ class PersonFixtureClient(
             val q = UUID.randomUUID().toString()
             val firstName = "f$i$q"
             val lastName = "l$i$q"
-            val response = client.create(CreatePersonRequest(firstName, lastName))
+            val response = client.create(CreatePersonRequestBody(firstName, lastName))
             fixtures.add(response.body()?.value!!)
         }
         return fixtures

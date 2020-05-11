@@ -11,9 +11,9 @@ import micronaut.bookman.SpecWithDataSource
 import micronaut.bookman.domain.book.Book
 import micronaut.bookman.domain.book.BookAuthor
 import micronaut.bookman.domain.book.BookRepository
-import micronaut.bookman.domain.book.error.DuplicateBookException
-import micronaut.bookman.domain.book.error.NoBookException
-import micronaut.bookman.domain.person.error.NoPersonException
+import micronaut.bookman.domain.book.exceptions.DuplicateBookException
+import micronaut.bookman.domain.book.exceptions.NoBookException
+import micronaut.bookman.domain.person.exceptions.NoPersonException
 import micronaut.bookman.infra.book.DBBookRepository
 import java.lang.IllegalArgumentException
 import java.util.*

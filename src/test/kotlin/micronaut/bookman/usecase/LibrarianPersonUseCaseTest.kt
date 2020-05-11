@@ -8,7 +8,7 @@ import micronaut.bookman.SpecWithDataSource
 import micronaut.bookman.domain.person.FullName
 import micronaut.bookman.domain.person.Person
 import micronaut.bookman.domain.person.PersonRepository
-import micronaut.bookman.domain.person.error.NoPersonException
+import micronaut.bookman.domain.person.exceptions.NoPersonException
 import java.util.*
 import javax.sql.DataSource
 

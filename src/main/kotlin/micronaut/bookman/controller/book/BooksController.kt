@@ -2,11 +2,9 @@ package micronaut.bookman.controller.book
 
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.*
-import micronaut.bookman.controller.BookErrorResponseSyntax.toResponseBody
-import micronaut.bookman.controller.PersonErrorResponseSyntax.toResponseBody
-import micronaut.bookman.controller.UnitResponse
-import micronaut.bookman.domain.book.error.NoBookException
-import micronaut.bookman.domain.person.error.NoPersonException
+import micronaut.bookman.controller.ResponseBody
+import micronaut.bookman.usecase.BookCollectionDto
+import micronaut.bookman.usecase.BookDto
 import micronaut.bookman.usecase.LibrarianBookUseCase
 
 @Controller("/books")
@@ -14,51 +12,33 @@ class BooksController(
         private val useCase: LibrarianBookUseCase
 ) : BooksApi {
 
-    override fun create(request: CreateBookRequest): HttpResponse<BookResponse> {
+    override fun create(request: CreateBookRequestBody): HttpResponse<ResponseBody<BookDto>> {
         val book = useCase.createBook(request.title, request.authorIds)
-        val body = BookResponse.success(book)
+        val body = ResponseBody.success(book)
         return HttpResponse.ok(body)
     }
 
-    override fun get(id: String): HttpResponse<BookResponse> {
-        return try {
-            val book = useCase.getBook(id)
-            val body = BookResponse.success(book)
-            HttpResponse.ok(body)
-        } catch (e: NoBookException) {
-            val body = BookResponse.failure(e.toResponseBody())
-            HttpResponse.ok(body)
-        }
+    override fun get(id: String): HttpResponse<ResponseBody<BookDto>> {
+        val book = useCase.getBook(id)
+        val body = ResponseBody.success(book)
+        return HttpResponse.ok(body)
     }
 
-    override fun delete(id: String): HttpResponse<UnitResponse> {
-        return try {
-            useCase.deleteBook(id)
-            val body = UnitResponse.success()
-            HttpResponse.ok(body)
-        } catch (e: NoBookException) {
-            val body = UnitResponse.failure(e.toResponseBody())
-            HttpResponse.ok(body)
-        }
+    override fun delete(id: String): HttpResponse<ResponseBody<Unit>> {
+        useCase.deleteBook(id)
+        val body = ResponseBody.success(Unit)
+        return HttpResponse.ok(body)
     }
 
-    override fun patch(id: String, request: PatchBookRequest): HttpResponse<BookResponse> {
-        return try {
-            val book = useCase.patchBook(id, request.title, request.authorIds)
-            val body = BookResponse.success(book)
-            HttpResponse.ok(body)
-        } catch (e: NoBookException) {
-            val body = BookResponse.failure(e.toResponseBody())
-            HttpResponse.ok(body)
-        } catch (e: NoPersonException) {
-            val body = BookResponse.failure(e.toResponseBody())
-            HttpResponse.ok(body)
-        }
+    override fun patch(id: String, request: PatchBookRequestBody): HttpResponse<ResponseBody<BookDto>> {
+        val book = useCase.patchBook(id, request.title, request.authorIds)
+        val body = ResponseBody.success(book)
+        return HttpResponse.ok(body)
     }
 
-    override fun list(page: Int?): HttpResponse<BookCollectionResponse> {
+    override fun list(page: Int?): HttpResponse<ResponseBody<BookCollectionDto>> {
         val books = useCase.listBook(page ?: 0)
-        val body = BookCollectionResponse.success(books)
+        val body = ResponseBody.success(books)
         return HttpResponse.ok(body)
     }
 

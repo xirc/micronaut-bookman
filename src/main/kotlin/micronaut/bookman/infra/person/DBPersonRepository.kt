@@ -4,12 +4,12 @@ import io.micronaut.context.annotation.Primary
 import micronaut.bookman.domain.person.FullName
 import micronaut.bookman.domain.person.Person
 import micronaut.bookman.domain.person.PersonRepository
-import micronaut.bookman.domain.person.error.DuplicatePersonException
-import micronaut.bookman.domain.person.error.NoPersonException
+import micronaut.bookman.domain.person.exceptions.DuplicatePersonException
+import micronaut.bookman.domain.person.exceptions.NoPersonException
 import micronaut.bookman.infra.DatabaseTrait
 import micronaut.bookman.infra.schema.PersonTable
-import micronaut.bookman.infra.error.IllegalDatabaseSchema
-import micronaut.bookman.infra.error.InfraException
+import micronaut.bookman.infra.exceptions.IllegalDatabaseSchema
+import micronaut.bookman.infra.exceptions.InfraException
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction

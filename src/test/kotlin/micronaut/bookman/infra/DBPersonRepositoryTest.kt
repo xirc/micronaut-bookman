@@ -7,11 +7,10 @@ import io.kotlintest.shouldNotThrowAny
 import io.kotlintest.shouldThrow
 import io.micronaut.test.annotation.MicronautTest
 import micronaut.bookman.SpecWithDataSource
-import micronaut.bookman.domain.person.FullName
 import micronaut.bookman.domain.person.Person
 import micronaut.bookman.domain.person.PersonRepository
-import micronaut.bookman.domain.person.error.DuplicatePersonException
-import micronaut.bookman.domain.person.error.NoPersonException
+import micronaut.bookman.domain.person.exceptions.DuplicatePersonException
+import micronaut.bookman.domain.person.exceptions.NoPersonException
 import micronaut.bookman.infra.person.DBPersonRepository
 import java.lang.IllegalArgumentException
 import java.util.*

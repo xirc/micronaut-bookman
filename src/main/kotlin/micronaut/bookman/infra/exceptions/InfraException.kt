@@ -1,9 +1,10 @@
-package micronaut.bookman.domain.person.error
+package micronaut.bookman.infra.exceptions
 
-class IllegalPersonStateException(
+// InfraException はアプリケーションの例外として処理したくないので Throwable を継承させる
+open class InfraException(
         override val message: String?,
         override val cause: Throwable?
-) : PersonDomainException(message, cause) {
+) : Throwable(message, cause) {
     constructor(message: String?) : this(message, null)
     constructor(cause: Throwable?) : this(cause?.toString(), cause)
     constructor() : this(null, null)
