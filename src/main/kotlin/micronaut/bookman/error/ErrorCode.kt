@@ -1,4 +1,4 @@
-package micronaut.bookman.controller
+package micronaut.bookman.error
 
 enum class ErrorCode(value: Int) {
     // Book 1000 ~ 1999

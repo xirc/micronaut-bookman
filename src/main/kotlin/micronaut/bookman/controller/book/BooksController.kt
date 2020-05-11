@@ -2,8 +2,8 @@ package micronaut.bookman.controller.book
 
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.*
-import micronaut.bookman.controller.BookErrorResponseSyntax.toResponseBody
-import micronaut.bookman.controller.PersonErrorResponseSyntax.toResponseBody
+import micronaut.bookman.error.BookErrorResponseSyntax.toResponseBody
+import micronaut.bookman.error.PersonErrorResponseSyntax.toResponseBody
 import micronaut.bookman.controller.UnitResponse
 import micronaut.bookman.domain.book.error.NoBookException
 import micronaut.bookman.domain.person.error.NoPersonException

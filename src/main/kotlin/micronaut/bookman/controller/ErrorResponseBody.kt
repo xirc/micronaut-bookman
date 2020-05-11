@@ -1,3 +1,5 @@
 package micronaut.bookman.controller
 
+import micronaut.bookman.error.ErrorCode
+
 data class ErrorResponseBody(val id: ErrorCode, val message: String)

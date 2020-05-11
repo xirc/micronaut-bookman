@@ -2,7 +2,6 @@ package micronaut.bookman.controller
 
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldNotBe
-import io.kotlintest.specs.StringSpec
 import io.micronaut.http.HttpStatus
 import io.micronaut.test.annotation.MicronautTest
 import micronaut.bookman.SpecWithDataSource
@@ -10,6 +9,7 @@ import micronaut.bookman.controller.person.CreatePersonRequest
 import micronaut.bookman.controller.person.PatchPersonRequest
 import micronaut.bookman.controller.person.PersonsClient
 import micronaut.bookman.domain.person.PersonRepository
+import micronaut.bookman.error.ErrorCode
 import java.util.*
 import javax.sql.DataSource
 
