@@ -26,7 +26,7 @@ class DBPersonSearchQueryService(
                 .orderBy(PersonTable.updatedDate, SortOrder.DESC)
     }
 
-    // TODO (HACK) THIS IMPLEMENTATION IS NAIVE and AWFUL. DONT USE PRODUCTION.
+    // TODO (HACK) THIS IMPLEMENTATION IS NAIVE and AWFUL. DONT in USE PRODUCTION.
     override fun searchAll(query: String, page: Long): PersonSearchQueryResultSet {
         if (page < 0) throw IllegalArgumentException("page should be positive or zero.")
         if (query.isBlank()) throw IllegalArgumentException("query should be non blank.")
