@@ -117,10 +117,12 @@ class DBPersonRepository(
         if (offsetPage < 0) throw AppIllegalArgumentException("offsetPage should be positive or zero.")
         return withUtcZone {
             transaction(Database.connect(source)) {
-                PersonTable.selectAll().orderBy(PersonTable.updatedDate, SortOrder.DESC).limit(
-                        PersonRepository.PageSize * PersonRepository.MaxPageCount,
-                        PersonRepository.PageSize * offsetPage
-                ).count() / PersonRepository.PageSize
+                PersonTable.slice(PersonTable.id, PersonTable.updatedDate).selectAll()
+                        .orderBy(PersonTable.updatedDate, SortOrder.DESC)
+                        .limit(
+                                PersonRepository.PageSize * PersonRepository.MaxPageCount,
+                                PersonRepository.PageSize * offsetPage
+                        ).count() / PersonRepository.PageSize
             }
         }
     }
