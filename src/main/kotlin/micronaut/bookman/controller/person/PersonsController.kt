@@ -2,7 +2,7 @@ package micronaut.bookman.controller.person
 
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.annotation.Controller
-import micronaut.bookman.exceptions.PersonErrorResponseSyntax.toResponseBody
+import micronaut.bookman.controller.ApplicationExceptionSyntax.toResponseBody
 import micronaut.bookman.controller.UnitResponse
 import micronaut.bookman.domain.person.exceptions.NoPersonException
 import micronaut.bookman.query.PersonSearchQueryService
