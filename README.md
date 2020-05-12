@@ -63,3 +63,4 @@ Use other solutions such as Elasticsearch in production.
 * DB migration can be more cool imo.
 * Cache Layer is not used now.
 * Can I merge `***UseCase` classes???
+* Use BINARY(16) instead of VARCHAR(36) for UUID. it's mistake.
