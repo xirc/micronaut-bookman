@@ -1,10 +1,10 @@
 package micronaut.bookman.domain.book
 
 interface BookRepository {
-    fun get(id: String): Book
+    fun get(id: BookId): Book
     fun save(book: Book): Book
     fun update(book: Book): Book
-    fun delete(id: String)
+    fun delete(id: BookId)
 
     fun getPage(page: Long): List<Book>
     fun countPage(offsetPage: Long): Long
