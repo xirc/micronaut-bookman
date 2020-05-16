@@ -3,6 +3,7 @@ package micronaut.bookman.usecase
 import micronaut.bookman.domain.book.Book
 import micronaut.bookman.domain.book.BookAuthor
 import micronaut.bookman.domain.book.BookRepository
+import micronaut.bookman.domain.person.PersonId
 import micronaut.bookman.domain.person.PersonRepository
 import micronaut.bookman.exceptions.AppIllegalArgumentException
 import javax.inject.Singleton
@@ -24,7 +25,7 @@ class LibrarianBookUseCase(
         if (title != null) {
             book.updateTitle(title)
         }
-        authorIds?.also {
+        authorIds?.map { PersonId.fromString(it) }?.also {
             book.updateAuthors(it.map { id -> BookAuthor(id) })
         }
         val savedBook = repository.save(book)
@@ -46,7 +47,11 @@ class LibrarianBookUseCase(
             book.updateTitle(title)
         }
         if (authorIds != null) {
-            book.updateAuthors(authorIds.map { BookAuthor(it) })
+            book.updateAuthors(authorIds.map {
+                PersonId.fromString(it)
+            }.map {
+                BookAuthor(it)
+            })
         }
         val updatedBook = repository.update(book)
         val authors = personRepository.getAll(updatedBook.authors.map { it.personId })

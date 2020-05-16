@@ -3,12 +3,11 @@ package micronaut.bookman.domain.person
 import micronaut.bookman.domain.person.exceptions.IllegalPersonStateException
 import micronaut.bookman.domain.time.DateTimeFactory
 import org.joda.time.DateTime
-import java.util.*
 import javax.inject.Singleton
 
 class Person private constructor(
         private val timeFactory: DateTimeFactory,
-        val id: String,
+        val id: PersonId,
         val createdDate: DateTime
 ) {
     var name: FullName = DefaultName
@@ -36,11 +35,11 @@ class Person private constructor(
     class Factory(private val timeFactory: DateTimeFactory) {
         fun create(): Person = Person(
                 timeFactory,
-                UUID.randomUUID().toString(),
+                PersonId(),
                 timeFactory.now()
         )
         fun createFromRepository(
-                id: String,
+                id: PersonId,
                 name: FullName,
                 createdDate: DateTime,
                 updatedDate: DateTime

@@ -3,6 +3,7 @@ package micronaut.bookman.infra.person
 import io.micronaut.context.annotation.Primary
 import micronaut.bookman.domain.person.FullName
 import micronaut.bookman.domain.person.Person
+import micronaut.bookman.domain.person.PersonId
 import micronaut.bookman.domain.person.PersonRepository
 import micronaut.bookman.domain.person.exceptions.DuplicatePersonException
 import micronaut.bookman.domain.person.exceptions.NoPersonException
@@ -26,7 +27,7 @@ class DBPersonRepository(
 ) : PersonRepository, DatabaseTrait {
     private fun createPerson(result: ResultRow): Person {
         return factory.createFromRepository(
-                result[PersonTable.id],
+                PersonId.fromString(result[PersonTable.id]),
                 FullName(
                         result[PersonTable.firstName],
                         result[PersonTable.lastName]
@@ -36,10 +37,10 @@ class DBPersonRepository(
         )
     }
 
-    override fun get(id: String): Person {
+    override fun get(id: PersonId): Person {
         return withUtcZone {
             transaction(Database.connect(source)) {
-                val person = PersonTable.select { PersonTable.id eq id }.singleOrNull()?.let {
+                val person = PersonTable.select { PersonTable.id eq id.toString() }.singleOrNull()?.let {
                     createPerson(it)
                 }
                 person ?: throw NoPersonException(id)
@@ -52,7 +53,7 @@ class DBPersonRepository(
             transaction(Database.connect(source)) {
                 try {
                     PersonTable.insert {
-                        it[id] = person.id
+                        it[id] = person.id.toString()
                         it[firstName] = person.name.firstName
                         it[lastName] = person.name.lastName
                         it[createdDate] = person.createdDate
@@ -73,7 +74,7 @@ class DBPersonRepository(
     override fun update(person: Person): Person {
         return withUtcZone {
             transaction(Database.connect(source)) {
-                val count = PersonTable.update({ PersonTable.id eq person.id }) {
+                val count = PersonTable.update({ PersonTable.id eq person.id.toString() }) {
                     it[firstName] = person.name.firstName
                     it[lastName] = person.name.lastName
                     it[createdDate] = person.createdDate
@@ -89,9 +90,9 @@ class DBPersonRepository(
         }
     }
 
-    override fun delete(id: String) {
+    override fun delete(id: PersonId) {
         return transaction (Database.connect(source)) {
-            val count = PersonTable.deleteWhere { PersonTable.id eq id }
+            val count = PersonTable.deleteWhere { PersonTable.id eq id.toString() }
             when (count) {
                 0 -> throw NoPersonException(id)
                 1 -> Unit
@@ -127,11 +128,12 @@ class DBPersonRepository(
         }
     }
 
-    override fun getAll(ids: List<String>): List<Person> {
+    override fun getAll(ids: List<PersonId>): List<Person> {
         if (ids.isEmpty()) return emptyList()
         return withUtcZone {
+            val sids = ids.map { it.toString() }
             transaction(Database.connect(source)) {
-                PersonTable.selectAll().orWhere { PersonTable.id inList ids }.map {
+                PersonTable.selectAll().orWhere { PersonTable.id inList sids }.map {
                     createPerson(it)
                 }
             }

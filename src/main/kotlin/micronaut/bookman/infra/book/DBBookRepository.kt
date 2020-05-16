@@ -6,6 +6,7 @@ import micronaut.bookman.domain.book.BookAuthor
 import micronaut.bookman.domain.book.BookRepository
 import micronaut.bookman.domain.book.exceptions.DuplicateBookException
 import micronaut.bookman.domain.book.exceptions.NoBookException
+import micronaut.bookman.domain.person.PersonId
 import micronaut.bookman.domain.person.exceptions.NoPersonException
 import micronaut.bookman.exceptions.AppIllegalArgumentException
 import micronaut.bookman.infra.schema.BookAuthorTable
@@ -52,7 +53,9 @@ class DBBookRepository(
                 book.title,
                 book.createdDate,
                 book.updatedDate,
-                authors.map { BookAuthor((it.personId)) }
+                authors.map {
+                    BookAuthor(PersonId.fromString(it.personId))
+                }
         )
     }
 
@@ -61,7 +64,7 @@ class DBBookRepository(
             BookAuthorTable.deleteWhere { BookAuthorTable.book_id eq bookId }
             BookAuthorTable.batchInsert(authors) {
                 this[BookAuthorTable.book_id] = bookId
-                this[BookAuthorTable.person_id] = it.personId
+                this[BookAuthorTable.person_id] = it.personId.toString()
             }
         } catch (e: ExposedSQLException) {
             if (e.cause is BatchUpdateException) {

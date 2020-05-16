@@ -1,6 +1,7 @@
 package micronaut.bookman.usecase
 
 import micronaut.bookman.domain.person.Person
+import micronaut.bookman.domain.person.PersonId
 import micronaut.bookman.domain.person.PersonRepository
 import micronaut.bookman.exceptions.AppIllegalArgumentException
 import javax.inject.Singleton
@@ -11,7 +12,7 @@ class LibrarianPersonUseCase(
         private val repository: PersonRepository
 ) {
     fun getPerson(id: String): PersonDto {
-        val person = repository.get(id)
+        val person = repository.get(PersonId.fromString(id))
         return PersonDto.createFrom(person)
     }
 
@@ -28,11 +29,11 @@ class LibrarianPersonUseCase(
     }
 
     fun deletePerson(id: String) {
-        repository.delete(id)
+        repository.delete(PersonId.fromString(id))
     }
 
     fun patchPerson(id: String, firstName: String?, lastName: String?): PersonDto {
-        val person = repository.get(id)
+        val person = repository.get(PersonId.fromString(id))
         firstName?.run {
             person.updateFirstName(firstName)
         }
