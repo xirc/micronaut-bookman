@@ -2,12 +2,14 @@ package micronaut.bookman.infra
 
 import io.kotlintest.matchers.collections.shouldBeOneOf
 import io.kotlintest.matchers.collections.shouldBeSortedWith
+import io.kotlintest.matchers.collections.shouldContain
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldNotThrowAny
 import io.kotlintest.shouldThrow
 import io.micronaut.test.annotation.MicronautTest
 import micronaut.bookman.SpecWithDataSource
 import micronaut.bookman.domain.person.Person
+import micronaut.bookman.domain.person.PersonId
 import micronaut.bookman.domain.person.PersonRepository
 import micronaut.bookman.domain.person.exceptions.DuplicatePersonException
 import micronaut.bookman.domain.person.exceptions.NoPersonException
@@ -51,7 +53,7 @@ class DBPersonRepositoryTest(
     }
 
     "DBPersonRepository cannot get a person with invalid ID" {
-        val id = UUID.randomUUID().toString()
+        val id = PersonId()
         shouldThrow<NoPersonException> {
             repository.get(id)
         }
@@ -140,17 +142,17 @@ class DBPersonRepositoryTest(
         val persons = repository.getAll(targetIds)
         persons.size shouldBe targetIds.size
         for (person in persons) {
-            person.id shouldBeOneOf targetIds
+            targetIds shouldContain person.id
         }
     }
 
     "DBPersonRepository can get persons with ID set which contains invalid ID" {
         val origPersons = personFixture.createCollection(10)
         val targetIds = origPersons.subList(2, 8).map { it.id }
-        val persons = repository.getAll(targetIds.plus(UUID.randomUUID().toString()))
+        val persons = repository.getAll(targetIds.plus(PersonId()))
         persons.size shouldBe targetIds.size
         for (person in persons) {
-            person.id shouldBeOneOf targetIds
+            targetIds shouldContain person.id
         }
     }
 

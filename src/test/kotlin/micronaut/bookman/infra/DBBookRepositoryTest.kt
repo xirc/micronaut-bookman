@@ -13,6 +13,7 @@ import micronaut.bookman.domain.book.BookAuthor
 import micronaut.bookman.domain.book.BookRepository
 import micronaut.bookman.domain.book.exceptions.DuplicateBookException
 import micronaut.bookman.domain.book.exceptions.NoBookException
+import micronaut.bookman.domain.person.PersonId
 import micronaut.bookman.domain.person.exceptions.NoPersonException
 import micronaut.bookman.exceptions.AppIllegalArgumentException
 import micronaut.bookman.infra.book.DBBookRepository
@@ -116,7 +117,7 @@ class DBBookRepositoryTest(
         repository.save(book)
 
         shouldThrow<NoPersonException> {
-            val personId = UUID.randomUUID().toString()
+            val personId = PersonId()
             val authors = listOf(BookAuthor(personId))
             book.updateAuthors(authors)
             repository.update(book)
@@ -157,7 +158,7 @@ class DBBookRepositoryTest(
             } else {
                 val personIds = origBook.authors.map { it.personId }
                 for (author in book.authors) {
-                    author.personId shouldBeOneOf personIds
+                    personIds shouldContain author.personId
                 }
             }
         }
