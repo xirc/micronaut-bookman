@@ -3,6 +3,7 @@ package micronaut.bookman.infra.book
 import io.micronaut.context.annotation.Primary
 import micronaut.bookman.domain.book.Book
 import micronaut.bookman.domain.book.BookAuthor
+import micronaut.bookman.domain.book.BookId
 import micronaut.bookman.domain.book.BookRepository
 import micronaut.bookman.domain.book.exceptions.DuplicateBookException
 import micronaut.bookman.domain.book.exceptions.NoBookException
@@ -49,7 +50,7 @@ class DBBookRepository(
     }
     private fun createBook(book: BookValue, authors: List<BookAuthorValue>): Book {
         return factory.createFromRepository(
-                book.id,
+                BookId.fromString(book.id),
                 book.title,
                 book.createdDate,
                 book.updatedDate,
@@ -59,11 +60,12 @@ class DBBookRepository(
         )
     }
 
-    private fun batchInsertBookAuthor(bookId: String, authors: List<BookAuthor>) {
+    private fun batchInsertBookAuthor(bookId: BookId, authors: List<BookAuthor>) {
         try {
-            BookAuthorTable.deleteWhere { BookAuthorTable.book_id eq bookId }
+            val sBookId = bookId.toString()
+            BookAuthorTable.deleteWhere { BookAuthorTable.book_id eq sBookId }
             BookAuthorTable.batchInsert(authors) {
-                this[BookAuthorTable.book_id] = bookId
+                this[BookAuthorTable.book_id] = sBookId
                 this[BookAuthorTable.person_id] = it.personId.toString()
             }
         } catch (e: ExposedSQLException) {
@@ -76,16 +78,17 @@ class DBBookRepository(
         }
     }
 
-    override fun get(id: String): Book {
+    override fun get(id: BookId): Book {
         return withUtcZone {
             transaction(Database.connect(source)) {
+                val sid = id.toString()
                 val bookValue = BookTable
-                        .select { BookTable.id eq id }.singleOrNull()?.let {
+                        .select { BookTable.id eq sid }.singleOrNull()?.let {
                             createBookValue(it)
                         }
                         ?: throw NoBookException(id)
                 val bookAuthorValues = BookAuthorTable
-                        .select { BookAuthorTable.book_id eq id }.map {
+                        .select { BookAuthorTable.book_id eq sid }.map {
                             createBookAuthorValue(it)
                         }
                 createBook(bookValue, bookAuthorValues)
@@ -98,7 +101,7 @@ class DBBookRepository(
             transaction(Database.connect(source)) {
                 try {
                     BookTable.insert {
-                        it[id] = book.id
+                        it[id] = book.id.toString()
                         it[title] = book.title
                         it[createdDate] = book.createdDate
                         it[updatedDate] = book.updatedDate
@@ -118,8 +121,9 @@ class DBBookRepository(
 
     override fun update(book: Book): Book {
         return withUtcZone {
+            val sBookId = book.id.toString()
             transaction(Database.connect(source)) {
-                val count = BookTable.update({ BookTable.id eq book.id }) {
+                val count = BookTable.update({ BookTable.id eq sBookId }) {
                     it[title] = book.title
                     it[createdDate] = book.createdDate
                     it[updatedDate] = book.updatedDate
@@ -135,10 +139,11 @@ class DBBookRepository(
         }
     }
 
-    override fun delete(id: String): Unit {
+    override fun delete(id: BookId): Unit {
+        val sid = id.toString()
         return transaction (Database.connect(source)) {
-            BookAuthorTable.deleteWhere { BookAuthorTable.book_id eq id }
-            val count = BookTable.deleteWhere { BookTable.id eq id }
+            BookAuthorTable.deleteWhere { BookAuthorTable.book_id eq sid }
+            val count = BookTable.deleteWhere { BookTable.id eq sid }
             when (count) {
                 0 -> throw NoBookException(id)
                 1 -> Unit

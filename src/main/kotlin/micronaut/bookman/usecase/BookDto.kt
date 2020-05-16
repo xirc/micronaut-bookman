@@ -16,7 +16,7 @@ data class BookDto private constructor(
 ) {
     companion object {
         fun createFrom(book: Book, authors: List<Person>) = BookDto(
-                book.id,
+                book.id.toString(),
                 book.title,
                 authors.map { PersonDto.createFrom(it) },
                 book.createdDate,

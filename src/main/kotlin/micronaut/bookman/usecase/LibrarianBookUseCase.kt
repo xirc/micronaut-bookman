@@ -2,6 +2,7 @@ package micronaut.bookman.usecase
 
 import micronaut.bookman.domain.book.Book
 import micronaut.bookman.domain.book.BookAuthor
+import micronaut.bookman.domain.book.BookId
 import micronaut.bookman.domain.book.BookRepository
 import micronaut.bookman.domain.person.PersonId
 import micronaut.bookman.domain.person.PersonRepository
@@ -15,7 +16,7 @@ class LibrarianBookUseCase(
         private val personRepository: PersonRepository
 ) {
     fun getBook(id: String): BookDto {
-        val book = repository.get(id)
+        val book = repository.get(BookId.fromString(id))
         val authors = personRepository.getAll(book.authors.map { it.personId })
         return BookDto.createFrom(book, authors)
     }
@@ -34,7 +35,7 @@ class LibrarianBookUseCase(
     }
 
     fun deleteBook(id: String) {
-        repository.delete(id)
+        repository.delete(BookId.fromString(id))
     }
 
     fun patchBook(
@@ -42,7 +43,7 @@ class LibrarianBookUseCase(
             title: String? = null,
             authorIds: List<String>? = null
     ): BookDto {
-        val book = repository.get(id)
+        val book = repository.get(BookId.fromString(id))
         if (title != null) {
             book.updateTitle(title)
         }

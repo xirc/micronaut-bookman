@@ -10,6 +10,7 @@ import io.micronaut.test.annotation.MicronautTest
 import micronaut.bookman.SpecWithDataSource
 import micronaut.bookman.domain.book.Book
 import micronaut.bookman.domain.book.BookAuthor
+import micronaut.bookman.domain.book.BookId
 import micronaut.bookman.domain.book.BookRepository
 import micronaut.bookman.domain.book.exceptions.DuplicateBookException
 import micronaut.bookman.domain.book.exceptions.NoBookException
@@ -56,7 +57,7 @@ class DBBookRepositoryTest(
     }
 
     "DBBookRepository cannot get a book with invalid ID" {
-        val id = UUID.randomUUID().toString()
+        val id = BookId()
         shouldThrow<NoBookException> {
             repository.get(id)
         }
